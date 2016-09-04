@@ -1,0 +1,415 @@
+{% extends './layouts/layout_with_backbtn.html' %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="/css/mobiscroll.custom-2.5.0.min.css"/>
+{% endblock %}
+
+{% block nav-center %}{{ drivingRange.name }}{% endblock %}
+{% block nav-right %}<div class="head_r2"><a id="pb-gsg-btn-share" class="white" href="javascript:void(0)"><i>分享</i></a></div>{% endblock %}
+
+{% block content %}
+<div data-ng-app="booking" data-ng-controller="bookingController">
+  <input id="location" type="hidden" value="22.529288,114.058063">
+  <div id="pb-gsg-course" class="mainer">
+    <div class="select_time1">
+      <img src="{{ drivingRange.photos[0] }}"/>
+      <div class="today_tq">
+        <a href="/weather?forecast=1">
+          <div class="today_tq_wd"></div>
+          <img class="today_tq_icon"/>
+          <img src="/img/img_c014.png"/>
+        </a>
+      </div>
+      <div class="today_dh"><button class="btn-routeplan"><img src="/img/img_c013.png"/></button></div>
+    </div>
+    <div class="ht30"></div>
+    <div class="st_table1">
+      <div class="st_tr st_tr1">
+        <div class="st_td1 st_td"><input class="st_data" type="text" data-ng-model="selectedDate" placeholder="日期"/></div>
+        <div class="st_td2 st_td"><input class="st_time" type="text" data-ng-model="selectedTime" placeholder="时间"/></div>
+      </div>
+      <div class="st_tr st_tr2">
+        <div class="st_td3 st_td">
+          <div class="st_p1">单人打球</div>
+          <div class="st_p2">果岭/僮/车/柜</div>
+        </div>
+        <div class="st_td5 st_td">
+          <div class="st_p5"><button id="btn-booking-single" class="btn-primary">预定</button></div>
+          <div class="st_p6">全额预付</div>
+        </div>
+        <div class="st_td4 st_td">
+          <div class="st_p3">￥{{ (drivingRange.fees / 100).toFixed(2) }}/人</div>
+        </div>
+      </div>
+      {% if false %}
+      <div class="st_tr st_tr2">
+        <div class="st_td3 st_td">
+          <div class="st_p1">多人同享（最少2位）</div>
+          <div class="st_p2">18洞果岭/僮/车/柜</div>
+        </div>
+        <div class="st_td5 st_td">
+          <div class="st_p5"><button class="btn-primary">预定</button></div>
+          <div class="st_p6">全额预付</div>
+        </div>
+        <div class="st_td4 st_td">
+          <div class="st_p7">￥1600</div>
+          <div class="st_p8">￥1300</div>
+          <div class="st_p4">/人</div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    <div class="ht30"></div>
+    <div class="st_table2">
+      <div class="st_tr st_tr3"><i class="st_i1">球场详情</i></div>
+      <div class="st_tr st_tr4">
+        <div class="st_2p1">
+          <i class="st_i2">球场模式</i>
+          <i class="st_i3">{{ drivingRange.type }}</i>
+        </div>
+        <div class="st_2p1">
+          <i class="st_i2">建立时间</i>
+          <i class="st_i3">{{ drivingRange.establishedDate.getFullYear() }}年{{ drivingRange.establishedDate.getMonth() + 1 }}月{{ drivingRange.establishedDate.getDate() }}日</i>
+        </div>
+        <div class="st_2p1">
+          <i class="st_i2">球场面积</i>
+          <i class="st_i3">{{ drivingRange.acreage }}亩</i>
+        </div>
+        <div class="st_2p1">
+          <i class="st_i2">果岭草种</i>
+          <i class="st_i3">{{ drivingRange.puttingGreenGrass}}</i>
+        </div>
+        <div class="st_2p1">
+          <i class="st_i2">球场数据</i>
+          <i class="st_i3">{{ drivingRange.holes }}洞{{ drivingRange.par }}杆</i>
+        </div>
+        <div class="st_2p1">
+          <i class="st_i2">设计师</i>
+          <i class="st_i3">{{ drivingRange.designer }}</i>
+        </div>
+        <div class="st_2p1">
+          <i class="st_i2">球道长度</i>
+          <i class="st_i3">{{ drivingRange.yardage }}</i>
+        </div>
+        <div class="st_2p1">
+          <i class="st_i2">球道草种</i>
+          <i class="st_i3">{{ drivingRange.fairwayGrass }}</i>
+        </div>
+      </div>
+      <div class="st_tr st_tr5">
+        <div class="st_addr text_overflow">{{ drivingRange.province + drivingRange.city + drivingRange.address }}</div>
+        <div class="st_dh"><button class="btn-routeplan">导航</button></div>
+      </div>
+      <div class="st_tr st_tr6">
+        <i class="st_i4">球场电话</i>
+        <i class="st_i5">{{ drivingRange.phoneNumber }}</i>
+      </div>
+      <div class="st_tr st_tr3"><i class="st_i1">球场简介</i></div>
+      <div class="st_tr st_tr8">
+        {{ drivingRange.introduction }}
+      </div>
+    </div>
+    <div class="ht30"></div>
+  </div>
+
+  <div id="pb-gsg-booking" class="pb-gsg-popup-container">
+    <div class="header">
+      <div class="head_c1 head_c2">
+        <div id="pb-gsg-back-booking" class="head_l1"><img src="/img/icon_c011.png" width="15"/></div>
+        <div class="head_center1">填写订单</div>
+        <div class="head_r1"><a href="tel:{{ preset.hotline }}"><img src="/img/icon_c021.png" width="28"/></a></div>
+      </div>
+    </div>
+    <div class="ht50"></div>
+    <!--================= 头部结束 ====================-->
+    <!--================= 内容开始 ====================-->
+    <div class="mainer">
+      <form name="booking" method="post" action="/order/drivingrange" novalidate>
+        <input type="hidden" name="drivingRangeId" value="{{ drivingRange._id.valueOf() }}">
+        <input type="text" name="date" data-ng-model="selectedDate" class="collapse" required>
+        <input type="text" name="time" data-ng-model="selectedTime" class="collapse" required>
+        <input type="hidden" name="payType" value="0">
+        <input type="text" name="total" data-ng-model="total" class="collapse">
+        <div class="txdd_page">
+          <div class="ht10"></div>
+          <div class="txdd_p1 txdd_p">
+            <i class="txdd_i1">{{ drivingRange.name }}</i>
+            <i class="txdd_i1">{% raw %}{{ selectedDate }} {{ selectedTime }}{% endraw %}</i>
+          </div>
+          <div class="txdd_p2 txdd_p">
+            <i class="txdd_i2">打球人数</i>
+            <i class="txdd_i3">
+              <button type="button" class="txdd_jian" data-ng-click="decreasePeople()">-</button>
+              <input class="txdd_ji" type="text" name="numberOfPeople" data-ng-model="numberOfPeople"/>
+              <button type="button" class="txdd_jia" data-ng-click="increasePeople()">+</button>
+              &nbsp;人
+            </i>
+          </div>
+          <div class="txdd_p3 txdd_p">
+            <i class="txdd_i2">打球人姓名</i>
+            <i class="txdd_i3">
+              <input class="cdjs_input3" type="text" name="name" data-ng-model="name" placeholder="请填写姓名" required>
+            </i>
+          </div>
+          <div class="txdd_p4 txdd_p">
+            <i class="txdd_i2">联系人手机</i>
+            <i class="txdd_i3">
+              <input class="cdjs_input3" type="number" name="phoneNumber" data-ng-model="mobile" placeholder="请填写手机" minlength="11" maxlength="11" data-ng-pattern="/(^(13\d|14[57]|15[^4,\D]|17[678]|18\d)\d{8}|170[059]\d{7})$/" required>
+            </i>
+          </div>
+          {% if false %}
+          <div class="txdd_p5 txdd_p" data-ng-show="numberOfPeople > 1">
+            <i class="txdd_i2">付款类型</i>
+            <i class="txdd_i3">
+              <label><input type="radio" name="payType" data-ng-model="payType" value="0" checked> 我付全款</label>
+              <label><input type="radio" name="payType" data-ng-model="payType" value="1"> AA付款</label>
+            </i>
+          </div>
+          {% endif %}
+          <div class="txdd_p5 txdd_p">
+            <textarea name="message" class="qt_liuyan" rows="" cols="" placeholder="其他留言"></textarea>
+          </div>
+          <div class="txdd_p6">
+            <i class="txdd_i6">球场现付<i class="txdd_i7">￥{% raw %}{{ getTotal() }}{% endraw %}</i></i>
+          </div>
+          <div class="ht10"></div>
+          <div class="alert alert-danger" data-ng-show="booking.$invalid && submitted" data-ng-cloak>
+            <ul class="list-layout">
+              <li data-ng-show="booking.date.$error.required">请选择日期</li>
+              <li data-ng-show="booking.time.$error.required">请选择时间</li>
+              <li data-ng-show="booking.name.$error.required">请输入姓名</li>
+              <li data-ng-show="booking.phoneNumber.$error.required">请输入手机</li>
+              <li data-ng-show="booking.phoneNumber.$error.pattern">请输入正确的手机</li>
+            </ul>
+          </div>
+          <div class="txdd_p7">
+            <button type="button" class="qd_yd" data-ng-click="validate()">确认并预定</button>
+          </div>
+          <div class="txdd_p8">
+            提示：订单提交后商家与球会确定是否可订，确定后会在30分钟内发短信通知您预定结果
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div id="pb-gsg-routeplan" class="pb-gsg-popup-container">
+    <div class="header">
+      <div class="head_c1 head_c2">
+        <div id="pb-gsg-back-routeplan" class="head_l1"><img src="/img/icon_c011.png" width="15"/></div>
+        <div class="head_center1">导航</div>
+      </div>
+    </div>
+    <div class="ht50"></div>
+    <div class="map-container pb-gsg-iframe-container">
+      <iframe id="pb-gsg-iframe-roadplan"></iframe>
+    </div>
+  </div>
+  <div id="pb-gsg-share-tips" class="pb-gsg-popup-container pb-gsg-share-tips">
+    <p class="pb-gsg-share-tips-content">点击右上角按钮<br>选择"发送给朋友"或者"分享到朋友圈"</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<script src="/js/mobiscroll.custom-2.5.0.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/angular-1.4.8-min.js"></script>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script type="text/javascript">
+  $(function(){
+//日历控件
+    $(".st_data").mobiscroll().date();
+    $(".st_time").mobiscroll().date();
+    var now = new Date();
+//初始化日期控件
+    var opt1 = {
+      preset: 'date', //日期，可选：date\datetime\time\tree_list\image_text\select
+      theme: 'android', //皮肤样式，可选：default\android\android-ics light\android-ics\ios\jqm\sense-ui\wp light\wp
+      display: 'bottom', //显示方式 ，可选：modal\inline\bubble\top\bottom
+      mode: 'scroller', //日期选择模式，可选：scroller\clickpick\mixed
+      lang:'zh',
+      dateFormat: 'yyyy-mm-dd', // 日期格式
+      setText: '确定', //确认按钮名称
+      cancelText: '取消',//取消按钮名籍我
+      dateOrder: 'yyyymmdd', //面板中日期排列格式
+      dayText: '日', monthText: '月', yearText: '年',hourText:'时', //面板中年月日文字
+      showNow: false,
+      nowText: "今",
+      startYear: now.getFullYear(), //开始年份
+      endYear: now.getFullYear() + 100, //结束年份
+      minDate: now
+    };
+//初始化日期控件
+    var opt2 = {
+      preset: 'time', //日期，可选：date\datetime\time\tree_list\image_text\select
+      theme: 'android', //皮肤样式，可选：default\android\android-ics light\android-ics\ios\jqm\sense-ui\wp light\wp
+      display: 'bottom', //显示方式 ，可选：modal\inline\bubble\top\bottom
+      mode: 'scroller', //日期选择模式，可选：scroller\clickpick\mixed
+      lang:'zh',
+      dateFormat: 'yyyy-mm-dd', // 日期格式
+      setText: '确定', //确认按钮名称
+      cancelText: '取消',//取消按钮名籍我
+      dateOrder: 'yyyymmdd', //面板中日期排列格式
+      dayText: '日', monthText: '月', yearText: '年',hourText:'时', //面板中年月日文字
+      showNow: false,
+      nowText: "今",
+      startYear: now.getFullYear(), //开始年份
+      endYear: now.getFullYear() + 100 //结束年份
+//      minDate: now
+    };
+
+    $(".st_data").mobiscroll(opt1);
+    $(".st_time").mobiscroll(opt2);
+
+  });
+
+  $('#btn-booking-single').click(function(){
+    $("#pb-gsg-booking").show();
+    $("#pb-gsg-course").hide();
+  });
+
+  $('#pb-gsg-back-booking').click(function(){
+    $('#pb-gsg-booking').hide();
+    $("#pb-gsg-course").show();
+  });
+
+  $("#pb-gsg-iframe-roadplan").height($(window).height() + 31);
+
+  var config = {{ wechatConfig|json|safe }};
+  var shareMessage = {{ shareMessage|json|safe }};
+  var drivingRange = {{ drivingRange|json|safe }};
+
+  wx.config({
+    debug: false,
+    appId: config.appId,
+    timestamp: config.timestamp,
+    nonceStr: config.nonceStr,
+    signature: config.signature,
+    jsApiList: ['getLocation', 'onMenuShareTimeline', 'onMenuShareAppMessage']
+  });
+
+  wx.ready(function() {
+    wx.getLocation({
+      type: 'wgs84',
+      success: function (res) {
+        var latitude = parseFloat(res.latitude);
+        var longitude = parseFloat(res.longitude);
+        $("#location").val(latitude + ',' + longitude);
+      }
+    });
+
+    wx.onMenuShareTimeline({
+      title: shareMessage.title,
+      link: shareMessage.link,
+      imgUrl: shareMessage.imgUrl,
+      success: function () {
+      },
+      cancel: function () {
+      }
+    });
+
+    wx.onMenuShareAppMessage({
+      title: shareMessage.title,
+      desc: shareMessage.desc,
+      link: shareMessage.link,
+      imgUrl: shareMessage.imgUrl,
+      success: function () {
+      },
+      cancel: function () {
+      }
+    });
+  });
+
+  var roadPlanLoaded = false;
+
+  $(".btn-routeplan").click(function(){
+    $("#pb-gsg-routeplan").show();
+    if(!roadPlanLoaded) {
+      $("#pb-gsg-iframe-roadplan").attr("src", "http://apis.map.qq.com/uri/v1/routeplan?type=drive&from=我的位置&fromcoord=" + $("#location").val() + "&to=" + drivingRange.name + "&tocoord=" + drivingRange.geospatial[1] + "," + drivingRange.geospatial[0] + "&policy=0&referer=myapp");
+      roadPlanLoaded = true;
+    }
+    $("#pb-gsg-course").hide();
+  });
+
+  $("#pb-gsg-back-routeplan").click(function(){
+    $("#pb-gsg-routeplan").hide();
+    $("#pb-gsg-course").show();
+  });
+
+  $("#pb-gsg-btn-share").click(function(){
+    $("#pb-gsg-share-tips").show();
+    $("html,body").css("position", "fixed");
+    $("html,body").css("overflow", "hidden");
+  });
+
+  $("#pb-gsg-share-tips").click(function(){
+    $("html,body").removeAttr("style");
+    $("#pb-gsg-share-tips").hide();
+  });
+
+  $('.today_tq_wd').html('-℃~-℃');
+  $.ajax({
+    type: 'POST',
+    url: 'http://apis.baidu.com/apistore/weatherservice/cityid?cityid=101280601',
+    beforeSend: function(XMLHttpRequest) {
+      XMLHttpRequest.setRequestHeader("apikey","3138b2742f8d7711949a6c21f79ef834");
+    },
+    success: function(data){
+      console.log(data);
+      var weatherData = data.retData;
+      $('.today_tq_wd').html(weatherData.l_tmp + '℃~' + weatherData.h_tmp + '℃');
+      if (weatherData.weather == '多云') {
+        $('.today_tq_icon').attr('src', '/img/img_weather_state_1.png');
+      } else {
+        $('.today_tq_icon').attr('src', '/img/img_weather_state_2.png');
+      }
+    },
+    dataType: 'json'
+  });
+
+  var fees = {{ drivingRange.fees|safe }};
+  var selectedDate = '{{ date|safe }}';
+  var selectedTime = '{{ time|safe }}';
+
+  var app = angular.module('booking', []);
+
+  app.controller('bookingController', function($scope, $http){
+    $scope.numberOfPeople = 1;
+    $scope.total = fees * $scope.numberOfPeople;
+    $scope.selectedDate = selectedDate;
+    $scope.selectedTime = selectedTime;
+    $scope.payType = 0;
+    $scope.submitted = false;
+
+    $scope.increasePeople = function(){
+      $scope.numberOfPeople++;
+
+      $scope.total = fees * $scope.numberOfPeople;
+    };
+
+    $scope.decreasePeople = function() {
+      if ($scope.numberOfPeople !== 1) {
+        $scope.numberOfPeople--;
+      }
+
+      $scope.total = fees * $scope.numberOfPeople;
+    };
+
+    $scope.getTotal = function(){
+      return ($scope.total / 100).toFixed(2);
+    };
+
+    $scope.validate = function(){
+      if(!$scope.booking.$valid){
+        $scope.submitted = true;
+      }else{
+        document.forms[0].submit();
+      }
+    };
+
+    $http.get("/driving-range-order/lastcontact").success(function(contact){
+      $scope.name = contact.name;
+      $scope.mobile = parseInt(contact.phoneNumber);
+    });
+  });
+</script>
+{% endblock %}

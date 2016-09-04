@@ -1,0 +1,167 @@
+{% extends './layouts/layout_with_backbtn.html' %}
+
+{% block nav-center %}
+<i>我的订单</i>
+{% endblock %}
+{% block content %}
+<div class="header">
+  <div class="head_c1 head_c2">
+    <div id="uol-back" class="head_l1"><img src="/img/icon_c011.png" width="15"/></div>
+    <div class="head_center1">我的订单</div>
+    <div class="head_r1"><a href="tel:{{ preset.hotline }}"><img src="/img/icon_c021.png" width="28"/></a></div>
+  </div>
+</div>
+<div id="container">
+  <div class="tab">
+    <ul class="tab-card">
+      <li>全部</li>
+      <li>
+        <img src="/img/icon_c038.png" width="20px"/>
+        <i>场地</i>
+      </li>
+      <li>
+        <img src="/img/icon_c039.png" width="22px"/>
+        <i>课程</i>
+      </li>
+    </ul>
+    <dl class="tab-paper">
+      <dd class="tp">
+        {% if totalOrders.length == 0 %}
+        <div class="no_result">没有订单</div>
+        {% endif %}
+        {% for order in totalOrders %}
+          {% if order.orderType == 0 %}
+          <a href="order/detail/course/{{order._id.valueOf()}}">
+          {% elseif order.orderType == 2 %}
+          <a href="order/detail/lesson/{{order._id.valueOf()}}">
+          {% else %}
+          <a href="order/detail/drivingrange/{{order._id.valueOf()}}">
+          {% endif %}
+          <div class="uorder-cell">
+            <img class="uorder-cell-place-img " src="{{order.thumbnail}}"/>
+
+            <div>
+              {% if order.state == 0 %}
+              <i class="uorder-cell-state">等待球场确认</i>
+              {% elseif order.state == 1 %}
+              <i class="uorder-cell-state">未付款</i>
+              {% elseif order.state == 2 %}
+              <i class="uorder-cell-state">开团招募中</i>
+              {% elseif order.state == 3 %}
+              <i class="uorder-cell-state">订单已完成</i>
+              {% elseif order.state == 4 %}
+              <i class="uorder-cell-state">订单已取消</i>
+              {% elseif order.state == 5 %}
+              <i class="uorder-cell-state">订单已取消</i>
+              {% endif %}
+              <i class="uorder-cell-price">{{order.numberOfPeople + "个|总价 ¥" + (order.numberOfPeople * order.fees / 100).toFixed(2)}}</i>
+
+              {% if order.orderType == 0 && order.numberOfPeople > 1 %}
+              {% if order.ownerId.valueOf() + "" == order.userId.valueOf() + "" %}
+              <img class="uorder-cell-state-img " src="/img/icon_c041.png"/>
+              {% else %}
+              <img class="uorder-cell-state-img " src="/img/icon_c040.png"/>
+              {% endif %}
+              {% elseif order.orderType == 2 && order.promotion == true %}
+              <img class="uorder-cell-state-img " src="/img/icon_c043.png"/>
+              {% endif %}
+
+              <i class="uorder-cell-course-name">{{order.title}}</i>
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+      </dd>
+      <dd class="tp">
+        {% for order in totalOrders %}
+        {% if order.orderType == 0 %}
+        <a href="order/detail/course/{{order._id.valueOf()}}">
+          <div class="uorder-cell">
+            <img class="uorder-cell-place-img " src="{{order.thumbnail}}"/>
+
+            <div>
+              {% if order.state == 0 %}
+              <i class="uorder-cell-state">等待球场确认</i>
+              {% elseif order.state == 1 %}
+              <i class="uorder-cell-state">未付款</i>
+              {% elseif order.state == 2 %}
+              <i class="uorder-cell-state">开团招募中</i>
+              {% elseif order.state == 3 %}
+              <i class="uorder-cell-state">订单已完成</i>
+              {% elseif order.state == 4 %}
+              <i class="uorder-cell-state">订单已取消</i>
+              {% elseif order.state == 5 %}
+              <i class="uorder-cell-state">订单已取消</i>
+              {% endif %}
+              <i class="uorder-cell-price">{{order.numberOfPeople + "个|总价 ¥" + (order.numberOfPeople * order.fees / 100).toFixed(2)}}</i>
+
+              {% if order.orderType == 0 && order.numberOfPeople > 1 %}
+              {% if order.ownerId.valueOf() + "" == order.userId.valueOf() + "" %}
+              <img class="uorder-cell-state-img " src="/img/icon_c041.png"/>
+              {% else %}
+              <img class="uorder-cell-state-img " src="/img/icon_c040.png"/>
+              {% endif %}
+              {% elseif order.orderType == 2 && order.promotion == true %}
+              <img class="uorder-cell-state-img " src="/img/icon_c043.png"/>
+              {% endif %}
+
+              <i class="uorder-cell-course-name">{{order.title}}</i>
+            </div>
+          </div>
+        </a>
+        {% endif %}
+        {% endfor %}
+      </dd>
+      <dd class="tp">
+        {% for order in totalOrders %}
+        {% if order.orderType == 2%}
+        <a href="/order/detail/lesson/{{order._id.valueOf()}}">
+          <div class="uorder-cell">
+            <img class="uorder-cell-place-img " src="{{order.thumbnail}}"/>
+
+            <div>
+              {% if order.state == 0 %}
+              <i class="uorder-cell-state">等待球场确认</i>
+              {% elseif order.state == 1 %}
+              <i class="uorder-cell-state">未付款</i>
+              {% elseif order.state == 2 %}
+              <i class="uorder-cell-state">开团招募中</i>
+              {% elseif order.state == 3 %}
+              <i class="uorder-cell-state">订单已完成</i>
+              {% elseif order.state == 4 %}
+              <i class="uorder-cell-state">订单已取消</i>
+              {% elseif order.state == 5 %}
+              <i class="uorder-cell-state">订单已取消</i>
+              {% endif %}
+              <i class="uorder-cell-price">{{order.numberOfPeople + "个|总价 ¥" + (order.numberOfPeople * order.fees / 100).toFixed(2)}}</i>
+
+              {% if order.orderType == 0 && order.numberOfPeople > 1 %}
+              {% if order.ownerId.valueOf() + "" == order.userId.valueOf() + "" %}
+              <img class="uorder-cell-state-img " src="/img/icon_c041.png"/>
+              {% else %}
+              <img class="uorder-cell-state-img " src="/img/icon_c040.png"/>
+              {% endif %}
+              {% elseif order.orderType == 2 && order.promotion == true %}
+              <img class="uorder-cell-state-img " src="/img/icon_c043.png"/>
+              {% endif %}
+              <i class="uorder-cell-course-name">{{order.title}}</i>
+            </div>
+          </div>
+        </a>
+        {% endif %}
+        {% endfor %}
+      </dd>
+    </dl>
+  </div>
+</div>
+{% endblock %}
+{% block footer %}
+<script type="text/javascript" src="/js/jquery-1.11.2-min.js"></script>
+<script type="text/javascript" src="/js/jquery-easing-min.js"></script>
+<script type="text/javascript" src="/js/jquery-tabs.js"></script>
+<script type="text/javascript">
+  $('#uol-back').click(function () {
+    self.location.href = "/user";
+  });
+</script>
+{% endblock %}

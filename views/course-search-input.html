@@ -1,0 +1,344 @@
+{% extends './layouts/layout_with_sidemenu.html' %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="/css/mobiscroll.custom-2.5.0.min.css"/>
+{% endblock %}
+{% block nav-center %}球场搜索{% endblock %}
+{% block nav-right %}{% endblock %}
+{% block content %}
+<div data-ng-app="search" data-ng-controller="searchController">
+  <input id="location" type="text" class="collapse" data-ng-model="location" data-ng-change="updateLocation()">
+  <input id="currentLocationName" type="text" class="collapse" data-ng-model="currentLocation.name">
+  <div id="pb-gsg-search-input" class="mainer">
+    <div class="ht30"></div>
+    <div class="cdjs_table1">
+      <div class="cdjs_tr">
+        <div class="cdjs_td1 csjs_td">
+          <img src="/img/icon_c006.png" width="25"/>
+          <i class="cdjs_i1">城市</i>
+          <i class="cdjs_i2">CITY</i>
+        </div>
+        <div id="btn-select-city" class="cdjs_td2 csjs_td" data-ng-cloak>
+          <i class="cdjs_i3" data-ng-if="currentLocationSelected">{% raw %}{{ currentLocation.name }}{% endraw %}<small>(当前位置)</small></i>
+          <i class="cdjs_i3" data-ng-if="!currentLocationSelected">{% raw %}{{ selectedCity.name }}{% endraw %}</i>
+          <img src="/img/icon_c010.png" width="10"/>
+        </div>
+      </div>
+      <div class="cdjs_tr">
+        <div class="cdjs_td1 csjs_td">
+          <img src="/img/icon_c007.png" width="25"/>
+          <i class="cdjs_i1">打球日期</i>
+          <i class="cdjs_i2">Date</i>
+        </div>
+        <div class="cdjs_td2 csjs_td">
+          <input class="cdjs_input1" type="text" readonly="readonly" data-ng-model="selectedDate" placeholder="日期">
+          <img src="/img/icon_c010.png" width="10"/>
+        </div>
+      </div>
+      <div class="cdjs_tr">
+        <div class="cdjs_td1 csjs_td">
+          <img src="/img/icon_c008.png" width="25"/>
+          <i class="cdjs_i1">打球时间</i>
+          <i class="cdjs_i2">Time</i>
+        </div>
+        <div class="cdjs_td2 csjs_td">
+          <input class="cdjs_input2" type="text" readonly="readonly" data-ng-model="selectedTime" placeholder="时间">
+          <img src="/img/icon_c010.png" width="10"/>
+        </div>
+      </div>
+      <div class="cdjs_tr">
+        <div class="cdjs_td1 csjs_td">
+          <img src="/img/icon_c009.png" width="25"/>
+          <i class="cdjs_i1">关键字</i>
+          <i class="cdjs_i2">Categories</i>
+        </div>
+        <div id="btn-select-keyword" class="cdjs_td2 csjs_td" data-ng-cloak>
+          <i class="cdjs_i3" data-ng-if="!selectedCourseName">球场名称</i>
+          <i class="cdjs_i3" data-ng-if="selectedCourseName">{% raw %}{{ selectedCourseName }}{% endraw %}</i>
+          <img src="/img/icon_c010.png" width="10"/>
+        </div>
+      </div>
+    </div>
+    <div class="ht30"></div>
+    <div><a href="{% raw %}{{ getSearchLink() }}{% endraw %}" class="cdjs_search">搜索</a></div>
+    <div class="ht30"></div>
+    <div class="cdjs_qc" data-ng-if="recommendedCourse" data-ng-cloak>
+      {% raw %}
+      <div class="cdjs_title">常去球场</div>
+      <div class="cdjs_li">
+        <a href="/course/{{ recommendedCourse._id }}?date={{ selectedDate }}&time={{ selectedTime }}">
+          <div class="cdjs_img">
+            <img data-ng-src="{{ recommendedCourse.thumbnail }}"/>
+          </div>
+          <div class="cdjs_text">
+            <div class="txt_table">
+              <div class="txt_td">
+                <div class="cdjs_p1">{{ recommendedCourse.name }}</div>
+                <div class="cdjs_p2">价格：¥{{ (recommendedCourse.fees / 100).toFixed(2) }}</div>
+                <div class="cdjs_p3" data-ng-if="recommendedCourse.distance">距离：{{ (recommendedCourse.distance / 1000).toFixed(2) }}KM</div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+      {% endraw %}
+    </div>
+    <div class="ht15"></div>
+  </div>
+
+  <div id="pb-gsg-select-city" class="pb-gsg-popup-container">
+    <div class="header">
+      <div class="head_c1 head_c2">
+        <div id="pb-gsg-back-city" class="head_l1"><img src="/img/icon_c011.png" width="15"/></div>
+        <div class="head_center1">选择城市</div>
+      </div>
+      <div class="city_search">
+        <input type="text" data-ng-model="cityKeyword" placeholder="输入城市名" />
+      </div>
+    </div>
+    <div class="ht50"></div>
+    <div class="ht70"></div>
+    <!--================= 头部结束 ====================-->
+    <!--================= 内容开始 ====================-->
+    <div class="mainer">
+      <div class="city_title">我看过的城市</div>
+      <div class="city_ul city_ul1">
+        {% raw %}
+        <div data-ng-repeat="city in searchedCities | filter:cityKeyword" class="city_li" data-ng-click="selectCity(city)">
+          <i class="city_i1">{{ city.name }}</i>
+          <i class="city_i2" data-ng-click="deleteCity($index)"><img src="/img/icon_c013.png" width="22px"/></i>
+        </div>
+        {% endraw %}
+        <div class="city_not1" data-ng-if="searchedCities.length == 0">
+          最近没有看过
+        </div>
+      </div>
+      <div class="city_title">热门城市</div>
+      <div class="city_ul city_ul2">
+        <div class="city_li" data-ng-click="selectCity()"><i class="city_i1">当前位置</i></div>
+        {% raw %}
+        <div data-ng-repeat="city in cities | filter:cityKeyword" class="city_li" data-ng-click="selectCity(city)">
+          <i class="city_i1">{{ city.name }}</i>
+        </div>
+        {% endraw %}
+      </div>
+    </div>
+  </div>
+
+  <div id="pb-gsg-select-keyword" class="pb-gsg-popup-container">
+    <div class="header">
+      <div class="head_c1 head_c2">
+        <div id="pb-gsg-back-keyword" class="head_l1"><img src="/img/icon_c011.png" width="15"/></div>
+        <div class="head_center1">
+          <input type="text" data-ng-model="courseKeyword" placeholder="输入球场关键字" />
+        </div>
+      </div>
+    </div>
+    <div class="ht50"></div>
+    <!--================= 头部结束 ====================-->
+    <!--================= 内容开始 ====================-->
+    <div class="mainer">
+      <div class="city_ul city_ul2">
+        {% raw %}
+        <div data-ng-repeat="course in courses | filter:courseKeyword" class="city_li" data-ng-click="selectCourse(course.name)"><i class="city_i1">{{ course.name }}</i></div>
+        {% endraw %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block footer %}
+<script src="/js/mobiscroll.custom-2.5.0.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="http://cdn.bootcss.com/moment.js/2.10.6/moment.min.js"></script>
+<script src="/js/angular-1.4.8-min.js"></script>
+<script charset="utf-8" src="http://map.qq.com/api/js?v=2.exp"></script>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script type="text/javascript">
+  $(function(){
+//日历控件
+    $('.cdjs_input1').mobiscroll().date();
+    $('.cdjs_input2').mobiscroll().date();
+
+    var now = new Date();
+
+//初始化日期控件
+    var opt1 = {
+      preset: 'date', //日期，可选：date\datetime\time\tree_list\image_text\select
+      theme: 'android', //皮肤样式，可选：default\android\android-ics light\android-ics\ios\jqm\sense-ui\wp light\wp
+      display: 'bottom', //显示方式 ，可选：modal\inline\bubble\top\bottom
+      mode: 'scroller', //日期选择模式，可选：scroller\clickpick\mixed
+      lang:'zh',
+      dateFormat: 'yyyy-mm-dd', // 日期格式
+      setText: '确定', //确认按钮名称
+      cancelText: '取消',//取消按钮名籍我
+      dateOrder: 'yyyymmdd', //面板中日期排列格式
+      dayText: '日', monthText: '月', yearText: '年',hourText:'时', //面板中年月日文字
+      showNow: false,
+      nowText: '今',
+      startYear: now.getFullYear(), //开始年份
+      endYear: now.getFullYear() + 100, //结束年份
+      minDate: now
+    };
+//初始化日期控件
+    var opt2 = {
+      preset: 'time', //日期，可选：date\datetime\time\tree_list\image_text\select
+      theme: 'android', //皮肤样式，可选：default\android\android-ics light\android-ics\ios\jqm\sense-ui\wp light\wp
+      display: 'bottom', //显示方式 ，可选：modal\inline\bubble\top\bottom
+      mode: 'scroller', //日期选择模式，可选：scroller\clickpick\mixed
+      lang:'zh',
+      dateFormat: 'yyyy-mm-dd', // 日期格式
+      setText: '确定', //确认按钮名称
+      cancelText: '取消',//取消按钮名籍我
+      dateOrder: 'yyyymmdd', //面板中日期排列格式
+      dayText: '日', monthText: '月', yearText: '年',hourText:'时', //面板中年月日文字
+      showNow: false,
+      nowText: '今',
+      startYear: now.getFullYear(), //开始年份
+      endYear: now.getFullYear() + 100 //结束年份
+//      minDate: now
+    };
+
+    $('.cdjs_input1').mobiscroll(opt1);
+    $('.cdjs_input2').mobiscroll(opt2);
+
+  });
+
+  $('#btn-select-city').click(function(){
+    $('#pb-gsg-select-city').show();
+    $('#pb-gsg-search-input').hide();
+  });
+
+  $('#pb-gsg-back-city').click(function(){
+    $('#pb-gsg-select-city').hide();
+    $('#pb-gsg-search-input').show();
+  });
+
+  $('#btn-select-keyword').click(function(){
+    $('#pb-gsg-select-keyword').show();
+    $('#pb-gsg-search-input').hide();
+  });
+
+  $('#pb-gsg-back-keyword').click(function(){
+    $('#pb-gsg-select-keyword').hide();
+    $('#pb-gsg-search-input').show();
+  });
+
+  var config = {{ wechatConfig|json|safe }};
+  wx.config({
+    debug: false,
+    appId: config.appId,
+    timestamp: config.timestamp,
+    nonceStr: config.nonceStr,
+    signature: config.signature,
+    jsApiList: ['getLocation']
+  });
+
+  wx.ready(function() {
+    wx.getLocation({
+      type: 'wgs84',
+      success: function (res) {
+        var latitude = parseFloat(res.latitude);
+        var longitude = parseFloat(res.longitude);
+        $("#location").val(longitude + ',' + latitude).change();
+      }
+    });
+  });
+
+  var citylocation = new qq.maps.CityService({
+    complete : function(results){
+      var addr = results.detail.detail.split(",");
+      $('#currentLocationName').val(addr[1]).change();
+    }
+  });
+
+  var app = angular.module('search', []);
+
+  app.controller('searchController', function($scope, $http){
+    $scope.selectedDate = moment().add(1, 'day').format("YYYY-MM-DD");
+    $scope.selectedTime = "09:30 AM";
+    $scope.currentLocationSelected = true;
+
+    $scope.searchedCities = [
+      {name: '深圳', geospatial: [114.058063, 22.529288]},
+      {name: '上海', geospatial: [121.482537, 31.235317]},
+      {name: '广州', geospatial: [113.270793, 23.13584]}
+    ];
+
+    $scope.cities = [
+      {name: '深圳', geospatial: [114.058063, 22.529288]},
+      {name: '上海', geospatial: [121.482537, 31.235317]},
+      {name: '广州', geospatial: [113.270793, 23.13584]},
+      {name: '三亚', geospatial: [109.518071, 18.258217]},
+      {name: '海口', geospatial: [110.339517, 20.025062]}
+    ];
+
+    $scope.currentLocation = {name: '', geospatial: [114.058063, 22.529288]};
+    var latLng = new qq.maps.LatLng(22.529288, 114.058063);
+    citylocation.searchCityByLatLng(latLng);
+
+    $scope.selectedCity = $scope.currentLocation;
+
+    $scope.updateLocation = function(){
+      var location = $scope.location.split(',');
+      var longitude = parseFloat(location[0]);
+      var latitude = parseFloat(location[1]);
+      $scope.currentLocation = {name: '', geospatial: [longitude, latitude]};
+      $scope.selectedCity = $scope.currentLocation;
+      var latLng = new qq.maps.LatLng(latitude, longitude);
+      citylocation.searchCityByLatLng(latLng);
+    };
+
+    $http.get('/course/names').success(function(data){
+      $scope.courses = data;
+    });
+
+    $scope.deleteCity = function(index){
+      $scope.searchedCities.splice(index, 1);
+    };
+
+    $scope.selectCity = function(city){
+      $scope.selectedCity = city ? city : $scope.currentLocation;
+      $scope.currentLocationSelected = city ? false : true;
+      $('#pb-gsg-select-city').hide();
+      $('#pb-gsg-search-input').show();
+    };
+
+    $scope.selectCourse = function(name){
+      $scope.selectedCourseName = name;
+      $('#pb-gsg-select-keyword').hide();
+      $('#pb-gsg-search-input').show();
+    };
+
+    $scope.getSearchLink = function(){
+      var link = [
+        '/course/search?geospatial='
+      ];
+
+      link.push($scope.selectedCity.geospatial.join(','));
+
+      if($scope.selectedDate){
+        link.push('&date=');
+        link.push($scope.selectedDate);
+      }
+
+      if($scope.selectedTime){
+        link.push('&time=');
+        link.push(encodeURI($scope.selectedTime));
+      }
+
+      if($scope.selectedCourseName){
+        link.push('&name=');
+        link.push(encodeURI($scope.selectedCourseName));
+      }
+
+      return link.join('');
+    };
+
+    $http.get('/course/recommended?geospatial=' + $scope.currentLocation.geospatial).success(function(data){
+      if(!data.status) {
+        $scope.recommendedCourse = data;
+      }
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,307 @@
+{% extends './layouts/layout_with_backbtn.html' %}
+
+{% block nav-left %}<div class="head_l1 custom-back-btn"><img src="/img/icon_c011.png" width="15"/></div>{% endblock %}v
+{% block nav-center %}课程订单详情{% endblock %}
+{% block nav-right %}<div class="head_r1"><a href="tel:{{ preset.hotline }}"><img src="/img/icon_c021.png" width="28"/></a></div>{% endblock %}
+
+{% block content %}
+<div class="mainer" data-ng-app="orderDetail" data-ng-controller="orderDetailController">
+  <div class="txdd_page">
+    <form name="lessonOrder" novalidate>
+      <div class="ht10"></div>
+      <div class="txdd_p1 txdd_p">
+        <i class="txdd_i1">{{ orderDetail.lessonName }}</i>
+        <i class="txdd_i1">{{ orderDetail.bookingDate }}</i>
+      </div>
+      {% if false %}
+      <div class="txdd_p1 txdd_p" data-ng-if="!editing">
+        <i class="txdd_i2">人数</i>
+        <i class="txdd_i3" data-ng-bind="orderDetail.numberOfPeople"></i>
+      </div>
+      <div class="txdd_p2 txdd_p" data-ng-if="editing">
+        <i class="txdd_i2">人数</i>
+        <i class="txdd_i3">
+          <button type="button" class="txdd_jian" data-ng-click="decreasePeople()">-</button>
+          <input class="txdd_ji" type="text" name="numberOfPeople" data-ng-model="orderDetail.numberOfPeople"/>
+          <button type="button" class="txdd_jia" data-ng-click="increasePeople()">+</button>
+          &nbsp;人
+        </i>
+      </div>
+      {% endif %}
+      <div class="txdd_p3 txdd_p">
+        <i class="txdd_i2">姓名</i>
+        <i class="txdd_i3"><input class="cdjs_input3" type="text" name="name" data-ng-model="orderDetail.name" placeholder="请填写姓名" data-ng-readonly="!editing" required></i>
+      </div>
+      <div class="txdd_p4 txdd_p">
+        <i class="txdd_i2">联系人手机</i>
+        <i class="txdd_i3">
+          <input class="cdjs_input3" type="number" name="phoneNumber" data-ng-model="orderDetail.phoneNumber" placeholder="请填写手机" minlength="11" maxlength="11" data-ng-pattern="/(^(13\d|14[57]|15[^4,\D]|17[678]|18\d)\d{8}|170[059]\d{7})$/" data-ng-readonly="!editing" required>
+        </i>
+      </div>
+      <div class="txdd_p5 txdd_p" data-ng-if="!editing" data-ng-cloak>
+        <i class="txdd_i2">留言</i>
+        <i class="txdd_i3" data-ng-bind="orderDetail.message"></i>
+      </div>
+      <div class="txdd_p5 txdd_p" data-ng-if="editing">
+        <textarea name="message" data-ng-model="orderDetail.message" class="qt_liuyan" rows="" cols="" placeholder="其他留言"></textarea>
+      </div>
+  <!--
+      <div class="txdd_p5 txdd_p">
+        <i class="txdd_i2">订单状态</i>
+        <i class="txdd_i3">{{ orderDetail.state }}</i>
+      </div>
+  -->
+      <div class="txdd_p5 txdd_p" data-ng-if="orderDetail.numberOfPeople > 1" data-ng-cloak>
+        <i class="txdd_i2">付款类型</i>
+        <i class="txdd_i3">
+          <label data-ng-if="(!editing && orderDetail.payType == 0) || editing"><input type="radio" name="payType" data-ng-model="orderDetail.payType" value="0" data-ng-if="editing"> 我付全款</label> 
+          <label data-ng-if="(!editing && orderDetail.payType == 1) || editing"><input type="radio" name="payType" data-ng-model="orderDetail.payType" value="1" data-ng-if="editing"> AA付款</label>
+        </i>
+      </div>
+    </form>
+    <div class="ht10"></div>
+    <div class="alert alert-danger" data-ng-show="lessonOrder.$invalid && submitted" data-ng-cloak>
+      <ul class="list-layout">
+        <li data-ng-show="lessonOrder.name.$error.required">请输入姓名</li>
+        <li data-ng-show="lessonOrder.phoneNumber.$error.required">请输入手机</li>
+        <li data-ng-show="lessonOrder.phoneNumber.$error.pattern">请输入正确的手机</li>
+      </ul>
+    </div>
+    <div class="od_state" data-ng-if="orderDetail.state < 4" data-ng-cloak>
+      <ul class="od_state_desc">
+        <li class="od_state_desc_true">选择课程<br>与时间</li>
+        <li data-ng-if="orderDetail.state == 0">等待球场<br>确认</li>
+        <li class="od_state_desc_true" data-ng-if="orderDetail.state >= 1">球场<br>已确认</li>
+        <li data-ng-if="orderDetail.state < 2">等待<br>支付</li>
+        <li class="od_state_desc_true" data-ng-if="orderDetail.state >= 2">支付<br>成功</li>
+        <li data-ng-class="{true: 'od_state_desc_true'}[orderDetail.state == 3]">预定课程<br>成功</li>
+      </ul>
+      {% raw %}
+      <div class="od_state_progress">
+        <img class="od_state_img" data-ng-src="/img/img_prg_{{ orderDetail.state }}.png"/>
+      </div>
+      {% endraw %}
+    </div>
+    <div class = "od_can_m" data-ng-if="orderDetail.state == 4 || orderDetail.state == 5" data-ng-cloak>
+      <i class="od_can_1">当前订单已取消</i>
+    </div>
+    {% raw %}
+    <div class="od_total_price" data-ng-cloak>
+      <i>
+        总价:￥
+        <i class="od_tp_1">{{ (orderDetail.fees / 100).toFixed(2) }}</i>
+        <i>/人 x </i>
+        <i class="od_tp_1">{{ orderDetail.numberOfPeople }}</i>
+        <i>人 =￥</i>
+        <i class="od_tp_1">{{ (orderDetail.fees * orderDetail.numberOfPeople / 100).toFixed(2) }}</i>
+      </i>
+    </div>
+    <div class="od_total_price">
+      <i>
+        您应付:￥
+        <i class="od_tp_1" data-ng-cloak>{{ getPay() }}</i>
+      </i>
+    </div>
+    {% endraw %}
+    {% if wpParams %}
+    <div class="ht20"></div>
+    <div class="txdd_p7">
+      <button id="btn-wppay" type="button" class="qd_yd btn-wechat-pay">微信支付</button>
+    </div>
+    {% endif %}
+    {% if false %}
+    <div data-ng-if="orderDetail.state < 2 && !editing">
+      <div class="ht20"></div>
+      <div class="txdd_p7">
+        <button class="qd_yd qd_invite" data-ng-click="edit()">修改订单</button>
+      </div>
+    </div>
+    <div data-ng-if="editing">
+      <div class="ht20"></div>
+      <div class="txdd_p7">
+        <button type="button" class="qd_yd qd_edit" data-ng-click="save()">保存修改</button>
+      </div>
+    </div>
+    <div data-ng-if="editing">
+      <div class="ht20"></div>
+      <div class="txdd_p7">
+        <button type="button" class="qd_yd qd_invite" data-ng-click="cancel()">取消修改</button>
+      </div>
+    </div>
+    <div data-ng-if="orderDetail.state == 2 && orderDetail.numberOfPeople > 1">
+      <div class="ht20"></div>
+      <div class="txdd_p7">
+        <button class="qd_yd qd_invite" data-ng-click="share()">邀请好友</button>
+      </div>
+    </div>
+    {% endif %}
+    <div class="od_ref">
+      <i class="od_ref_1">您的订单号是</i>
+      <i class="od_ref_2">{{ orderDetail.refId }}</i>
+    </div>
+    <div class="ht20"></div>
+  </div>
+</div>
+<div id="pb-gsg-share-tips" class="pb-gsg-popup-container pb-gsg-share-tips">
+  <p class="pb-gsg-share-tips-content">点击右上角按钮<br>选择"发送给朋友"或者"分享到朋友圈"</p>
+</div>
+{% endblock %}
+
+{% block footer %}
+{% if wpParams %}
+<script>
+
+  function onBridgeReady(){
+    WeixinJSBridge.invoke('getBrandWCPayRequest', {{ wpParams|json|safe }}, function(res){
+      if(res.err_msg == "get_brand_wcpay_request:ok") {
+        location.reload(true);
+      }
+    });
+  }
+
+  $("#btn-wppay").click(function(){
+    if (typeof WeixinJSBridge == "undefined"){
+      if( document.addEventListener ){
+        document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+      }else if (document.attachEvent){
+        document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+        document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+      }
+    }else{
+      onBridgeReady();
+    }
+  });
+</script>
+{% endif %}
+<script src="/js/angular-1.4.8-min.js"></script>
+<script type="text/javascript">
+  $(".custom-back-btn").click(function(){
+    self.location.href = '/order';
+  });
+
+  $("#pb-gsg-share-tips").click(function(){
+    $("html,body").removeAttr("style");
+    $("#pb-gsg-share-tips").hide();
+  });
+  
+  var orderDetail = {{ orderDetail|json|safe }};
+  
+  var app = angular.module('orderDetail', []);
+
+  app.controller('orderDetailController', function ($scope, $http) {
+    $scope.editing = false;
+    $scope.orderDetail = orderDetail;
+    $scope.submitted = false;
+    
+    $scope.share = function(){
+      $("#pb-gsg-share-tips").show();
+      $("html,body").css("position", "fixed");
+      $("html,body").css("overflow", "hidden");
+    };
+        
+    $scope.edit = function(){
+      $scope.copy = angular.copy($scope.orderDetail);
+      $scope.editing = true;
+    };
+    
+    $scope.cancel = function(){
+      $scope.orderDetail = angular.copy($scope.copy);
+      $scope.editing = false;
+    };
+    
+    $scope.save = function(){
+      if(!$scope.lessonOrder.$valid){
+        $scope.submitted = true;
+        return;
+      }
+      
+      if(angular.equals($scope.orderDetail, $scope.copy)){
+        $scope.editing = false;
+        return;
+      }
+
+      $http.put('/lesson-order', $scope.orderDetail).success(function(data){
+        if(data.result){
+          $scope.editing = false;
+          $scope.orderDetail.state = 0;
+        }else{
+          alert('修改失败，请稍后重试。');
+        }
+      }).error(function(){
+        alert('无法连接网络，请检查您的网络。');
+      })
+    };
+    
+    $scope.increasePeople = function(){
+      $scope.orderDetail.numberOfPeople++;
+    };
+
+    $scope.decreasePeople = function() {
+      if ($scope.orderDetail.numberOfPeople !== 1) {
+        $scope.orderDetail.numberOfPeople--;
+      }
+      
+      if($scope.orderDetail.numberOfPeople === 1){
+        $scope.orderDetail.payType = 0;
+      }
+    };
+    
+    $scope.getPay = function(){
+      var num = $scope.orderDetail.payType == 0 ? $scope.orderDetail.numberOfPeople : 1;
+      return ($scope.orderDetail.fees * num / 100).toFixed(2);
+    };
+  });
+</script>
+{% if wechatConfig %}
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script>
+  var config = {{ wechatConfig|json|safe }};
+  var shareMessage = {{ shareMessage|json|safe }};
+  
+  var updateGroup = function(){
+    $.ajax({
+      url: '/lesson-order/group/' + orderDetail.orderId,
+      type: 'PUT'
+    }).done(function(data){
+      console.log('isGroup success');
+    }).error(function(data){
+      console.log('isGroup fail');
+    });
+  };
+  
+  wx.config({
+    debug: false,
+    appId: config.appId,
+    timestamp: config.timestamp,
+    nonceStr: config.nonceStr,
+    signature: config.signature,
+    jsApiList: ['onMenuShareTimeline', 'onMenuShareAppMessage']
+  });
+
+  wx.ready(function() {
+    wx.onMenuShareTimeline({
+      title: shareMessage.title,
+      link: shareMessage.link,
+      imgUrl: shareMessage.imgUrl,
+      success: function () {
+        updateGroup();
+      },
+      cancel: function () {
+      }
+    });
+
+    wx.onMenuShareAppMessage({
+      title: shareMessage.title,
+      desc: shareMessage.desc,
+      link: shareMessage.link,
+      imgUrl: shareMessage.imgUrl,
+      success: function () {
+        updateGroup();
+      },
+      cancel: function () {
+      }
+    });
+  });
+</script>
+{% endif %}
+{% endblock %}

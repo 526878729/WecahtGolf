@@ -1,0 +1,45 @@
+{% extends './layouts/layout_with_backbtn.html' %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="/css/owl.carousel.css"/>
+<style type="text/css">
+  #container {
+    position: relative;
+  }
+
+  .master-poster-tips {
+    color: #fff;
+    text-align: center;
+    position: absolute;
+    top:0;
+    width: 100%;
+  }
+
+  .master-poster {
+    width: 100%;
+  }
+
+</style>
+{% endblock %}
+
+{% block nav-left %}<div class="head_l1 custom-back-btn"><img src="/img/icon_c011.png" width="15"/></div>{% endblock %}v
+{% block nav-center %}
+<i>我的海报</i>
+{% endblock %}
+{% block nav-right %}<div class="head_r2"><a id="pb-gsg-btn-share" class="white" href="javascript:void(0)"><i>分享</i></a></div>{% endblock %}
+{% block content %}
+<div id="container">
+  <img class="master-poster" src="/master_files/posters/{{ userId }}.jpg">
+</div>
+{% endblock %}
+{% block footer %}
+<script type="text/javascript">
+  $(".custom-back-btn").click(function(){
+    self.location.href = '/user';
+  });
+
+  $("#pb-gsg-btn-share").click(function(){
+    alert("长按图片并保存，转发至朋友圈或微信群，快去邀请更多好友吧！");
+  });
+</script>
+{% endblock %}

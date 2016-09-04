@@ -1,0 +1,98 @@
+<div id="unconfirmedCommissionPanel" ng-controller="unconfirmedCommissionPanelController">
+  <section class="content-header">
+    <h1>
+      待支付佣金列表
+      <small>待支付佣金列表管理</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/admin/"><i class="fa fa-dashboard"></i> 主页</a></li>
+      <li class="active">待支付佣金列表</li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div id="unConfirmedCommissionListRow" class="row">
+      <div class="col-xs-12">
+        <div class="box">
+          <div class="box-header">
+            <h3 class="box-title">待支付佣金列表</h3>
+          </div>
+          <!-- /.box-header -->
+          <div class="box-body">
+            <table id="unconfirmedCommissionListTable" class="table table-bordered table-striped">
+              <thead>
+              <tr>
+                <th>订单ID</th>
+                <th>消费者ID</th>
+                <th>推荐人ID</th>
+                <th>推荐人昵称</th>
+                <th>佣金</th>
+                <th>订单状态</th>
+                <th>下单时间</th>
+                <th>操作</th>
+              </tr>
+              </thead>
+              <tfoot>
+              <tr>
+                <th>订单ID</th>
+                <th>消费者ID</th>
+                <th>推荐人ID</th>
+                <th>推荐人昵称</th>
+                <th>佣金</th>
+                <th>订单状态</th>
+                <th>下单时间</th>
+                <th>操作</th>
+              </tr>
+              </tfoot>
+            </table>
+          </div>
+          <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+      </div>
+    </div>
+
+
+    <div id="confirmCommissionModal" class="modal modal-warning fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">确认支付佣金</h4>
+          </div>
+          <div class="modal-body">
+            <p id="confirmCommissionModalContent"></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-outline" ng-click='confirmCommission();'>确认</button>
+          </div>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+
+    <div id="cancelCommissionModal" class="modal modal-danger fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">取消订单佣金</h4>
+          </div>
+          <div class="modal-body">
+            <p id="cancelCommissionModalContent"></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-outline" ng-click='cancelCommission();'>确认</button>
+          </div>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+  </section>
+</div>

@@ -1,0 +1,311 @@
+{% extends './layouts/layout_with_backbtn.html' %}
+
+{% block nav-left %}
+  {% if joined %}
+  <div class="head_l1 custom-back-btn"><img src="/img/icon_c011.png" width="15"/></div>
+  {% endif %}
+{% endblock %}
+{% block nav-center %}
+  {% if joined %}
+  课程订单详情
+  {% else %}
+  {{ orderDetail.lessonName }}
+  {% endif %}
+{% endblock %}
+{% block nav-right %}<div class="head_r1"><a href="tel:{{ preset.hotline }}"><img src="/img/icon_c021.png" width="28"/></a></div>{% endblock %}
+
+{% block content %}
+<div class="mainer" data-ng-app="orderDetail" data-ng-controller="orderDetailController">
+  <div class="txdd_page">
+    <div class="ht10"></div>
+    <div class="txdd_p1 txdd_p">
+      <i class="txdd_i1">{{ orderDetail.lessonName }}</i>
+      <i class="txdd_i1">{{ orderDetail.bookingDate }}</i>
+    </div>
+    <div class="txdd_p1 txdd_p" data-ng-if="!editing">
+      <i class="txdd_i2">人数</i>
+      <i class="txdd_i3" data-ng-bind="orderDetail.numberOfPeople"></i>
+    </div>
+    <div class="txdd_p5 txdd_p">
+      <i class="txdd_i2">付款类型</i>
+      <i class="txdd_i3" data-ng-if="orderDetail.payType == 0">团长付款</i>
+      <i class="txdd_i3" data-ng-if="orderDetail.payType == 1">AA付款</i>
+    </div>
+    <div class="in_total_people" data-ng-if="orderDetail.joinedNumPeople < orderDetail.numberOfPeople">
+      <i>
+        还差
+        <i class="od_tp_it" data-ng-bind="orderDetail.numberOfPeople - orderDetail.joinedNumPeople"></i>
+        人, 盼您如南方人盼温暖
+      </i>
+    </div>
+    <div class="in_total_people" data-ng-if="orderDetail.joinedNumPeople == orderDetail.numberOfPeople && orderDetail.state < 3">
+      <i>
+        <i class="od_tp_it_en">参团人数已足够</i>
+      </i>
+    </div>
+    {% raw %}
+    <div class="in_rm_time" data-ng-if="orderDetail.state < 3" data-ng-cloak>
+      <i>剩余</i>
+      <i class = "in_rm_p_t">&nbsp;{{ countdown.days }}&nbsp;</i>&nbsp;:
+      <i class = "in_rm_p_t">&nbsp;{{ countdown.hours }}&nbsp;</i>&nbsp;:
+      <i class = "in_rm_p_t">&nbsp;{{ countdown.minutes }}&nbsp;</i>&nbsp;:
+      <i class = "in_rm_p_t">&nbsp;{{ countdown.seconds }}&nbsp;</i>
+      <i>结束</i>
+    </div>
+    {% endraw %}
+    {% for user in joinedUsers %}
+    <div class="in_ul_cell">
+      <img class="in_ul_cell_img" src="{{ user.avatar }}">
+      <i class="in_ul_cell_txt_1">{{ user.nickName }}</i>
+      <i class="in_ul_cell_txt_2" data-ng-if="orderDetail.payType == 1">{{ user.payState }}</i>
+      <i class="in_ul_cell_txt_3">{{ user.createDate }}</i>
+    </div>
+    {% endfor %}
+    <div class="in_rm_p" data-ng-if="orderDetail.paidNumOfPeople != orderDetail.numberOfPeople && orderDetail.payType == 1">
+      <i>
+        还有
+        <i data-ng-bind="orderDetail.numberOfPeople - orderDetail.paidNumOfPeople"></i>
+        人, 未支付
+      </i>
+    </div>
+    <div class="od_state" data-ng-if="orderDetail.state < 4">
+      <ul class="od_state_desc">
+        <li class="od_state_desc_true">团长<br>开团</li>
+        <li data-ng-if="orderDetail.joinedNumPeople != orderDetail.numberOfPeople">等待团友<br>参团</li>
+        <li class="od_state_desc_true" data-ng-if="orderDetail.joinedNumPeople == orderDetail.numberOfPeople">参团人数<br>已足够</li>
+        <li data-ng-if="orderDetail.paidNumOfPeople != orderDetail.numberOfPeople">等待团友<br>支付</li>
+        <li class="od_state_desc_true" data-ng-if="orderDetail.paidNumOfPeople == orderDetail.numberOfPeople">支付<br>成功</li>
+        <li data-ng-class="{true: 'od_state_desc_true'}[orderDetail.state == 3]">预定课程<br>成功</li>
+      </ul>
+      {% raw %}
+      <div class="od_state_progress">
+        <img class="od_state_img" data-ng-src="/img/img_prg_{{ getCurrState() }}.png"/>
+      </div>
+      {% endraw %}
+    </div>
+    <div class = "od_can_m" data-ng-if="orderDetail.state == 4 || orderDetail.state == 5">
+      <i class="od_can_1">当前订单已取消</i>
+    </div>
+    {% if joined %}
+    {% raw %}
+    <div class="od_total_price">
+      <i>
+        总价:￥
+        <i class="od_tp_1">{{ (orderDetail.fees / 100).toFixed(2) }}</i>
+        <i>/人 x </i>
+        <i class="od_tp_1">{{ orderDetail.numberOfPeople }}</i>
+        <i>人 =￥</i>
+        <i class="od_tp_1">{{ (orderDetail.fees * orderDetail.numberOfPeople / 100).toFixed(2) }}</i>
+      </i>
+    </div>
+    <div class="od_total_price" data-ng-if="orderDetail.payType == 1">
+      <i>
+        您应付:￥
+        <i class="od_tp_1">{{ getPay() }}</i>
+      </i>
+    </div>
+    {% endraw %}
+    {% endif %}
+    {% if wpParams %}
+    <div class="ht20"></div>
+    <div class="txdd_p7">
+      <button id="btn-wppay" type="button" class="qd_yd btn-wechat-pay">微信支付</button>
+    </div>
+    {% endif %}
+    {% if !isFull %}
+      {% if !joined %}
+    <div class="ht20"></div>
+    <div class="txdd_p7">
+      <button class="qd_yd qd_invite" data-ng-click="join()">我要参团</button>
+    </div>
+      {% endif %}
+      {% if isOwner %}
+    <div class="ht20"></div>
+    <div class="txdd_p7">
+      <button class="qd_yd qd_invite" data-ng-click="share()">邀请好友</button>
+    </div>
+      {% endif %}
+    {% endif %}
+    <div class="od_ref">
+      <i class="od_ref_1">您的订单号是</i>
+      <i class="od_ref_2">{{ orderDetail.refId }}</i>
+    </div>
+    <div class="ht20"></div>
+  </div>
+</div>
+<div id="pb-gsg-share-tips" class="pb-gsg-popup-container pb-gsg-share-tips">
+  <p class="pb-gsg-share-tips-content">点击右上角按钮<br>选择"发送给朋友"或者"分享到朋友圈"</p>
+</div>
+{% endblock %}
+{% block footer %}
+{% if wpParams %}
+<script>
+
+  function onBridgeReady(){
+    WeixinJSBridge.invoke('getBrandWCPayRequest', {{ wpParams|json|safe }}, function(res){
+      if(res.err_msg == "get_brand_wcpay_request:ok") {
+        location.reload();
+      }
+    });
+  }
+
+  $("#btn-wppay").click(function(){
+    if (typeof WeixinJSBridge == "undefined"){
+      if( document.addEventListener ){
+        document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+      }else if (document.attachEvent){
+        document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+        document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+      }
+    }else{
+      onBridgeReady();
+    }
+  });
+</script>
+{% endif %}
+<script src="/js/angular-1.4.8-min.js"></script>
+<script type="text/javascript">
+  $(".custom-back-btn").click(function(){
+    self.location.href = '/order';
+  });
+  
+  $("#pb-gsg-share-tips").click(function(){
+    $("html,body").removeAttr("style");
+    $("#pb-gsg-share-tips").hide();
+  });
+  
+  var orderDetail = {{ orderDetail|json|safe }};
+  
+  var app = angular.module('orderDetail', []);
+  
+  app.controller('orderDetailController', function ($scope, $http) {
+    $scope.orderDetail = orderDetail;
+    $scope.countdown = {days:"", hours:"", minutes:"", seconds:""};
+    
+    $scope.share = function(){
+      $("#pb-gsg-share-tips").show();
+      $("html,body").css("position", "fixed");
+      $("html,body").css("overflow", "hidden");
+    };
+    
+    $scope.getCurrState = function(){
+      var order = $scope.orderDetail;
+      
+      if(order.joinedNumPeople != order.numberOfPeople){
+        return 0;
+      }
+      
+      if(order.paidNumOfPeople != order.numberOfPeople){
+        return 1;
+      }
+      
+      if(order.paidNumOfPeople == order.numberOfPeople){
+        return 3;
+      }
+    };
+    
+    $scope.join = function(){
+      $http.post('/lesson-order/join', orderDetail).success(function(data){
+        if(data.result){
+          alert('参团成功');
+          location.reload(true);
+        }else{
+          alert('参团失败\n' + data.error);
+        }
+      }).error(function(){
+        
+      });
+    };
+    
+    $scope.getPay = function(){
+      var num = $scope.orderDetail.payType == 0 ? $scope.orderDetail.numberOfPeople : 1;
+      return ($scope.orderDetail.fees * num / 100).toFixed(2);
+    };
+    
+    var tmpBeginTime = new Date();
+    var tmpEndTime = new Date($scope.orderDetail.expiredDate.replace(/-/g, "\/"));
+    
+    if ($scope.orderDetail.state < 3) {
+      var countDown = tmpEndTime.getTime() - tmpBeginTime.getTime();
+      var timeOut = countDown;
+
+      var myTime = setInterval(function() {
+        calculateTime();
+        $scope.$digest(); // 通知视图模型的变化
+      }, 1000);
+
+      setTimeout(function() {
+        clearInterval(myTime);
+        $scope.countdown = {};
+      }, timeOut);
+    }
+
+
+    var calculateTime = function () {
+      //计算出小时数
+      countDown -= 1000;
+
+      var days=Math.floor(countDown/(24*3600*1000))
+      var daysStr = days < 10 ? ("0"+days) : days;
+
+      var leave1=countDown%(24*3600*1000);   //计算天数后剩余的毫秒数
+      var hours=Math.floor(leave1/(3600*1000));
+      var hoursStr = hours < 10 ? ("0"+hours) : hours;
+
+      //计算相差分钟数
+      var leave2=leave1%(3600*1000);        //计算小时数后剩余的毫秒数
+      var minutes=Math.floor(leave2/(60*1000));
+      var minutesStr = minutes < 10 ? ("0"+minutes) : minutes;
+
+      //计算相差秒数
+      var leave3=leave2%(60*1000);      //计算分钟数后剩余的毫秒数
+      var seconds=Math.round(leave3/1000);
+      var secondsStr = seconds < 10 ? ("0"+seconds) : seconds;
+
+      $scope.countdown.days = daysStr;
+      $scope.countdown.hours = hoursStr;
+      $scope.countdown.minutes = minutesStr;
+      $scope.countdown.seconds = secondsStr;
+    };
+  });
+</script>
+{% if wechatConfig %}
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script>
+  var config = {{ wechatConfig|json|safe }};
+  var shareMessage = {{ shareMessage|json|safe }};
+  
+  wx.config({
+    debug: false,
+    appId: config.appId,
+    timestamp: config.timestamp,
+    nonceStr: config.nonceStr,
+    signature: config.signature,
+    jsApiList: ['onMenuShareTimeline', 'onMenuShareAppMessage']
+  });
+
+  wx.ready(function() {
+    wx.onMenuShareTimeline({
+      title: shareMessage.title,
+      link: shareMessage.link,
+      imgUrl: shareMessage.imgUrl,
+      success: function () {
+      },
+      cancel: function () {
+      }
+    });
+
+    wx.onMenuShareAppMessage({
+      title: shareMessage.title,
+      desc: shareMessage.desc,
+      link: shareMessage.link,
+      imgUrl: shareMessage.imgUrl,
+      success: function () {
+      },
+      cancel: function () {
+      }
+    });
+  });
+</script>
+{% endif %}
+{% endblock %}

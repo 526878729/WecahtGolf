@@ -1,0 +1,240 @@
+<!-- Content Header (Page header) -->
+<div id="lessonPromotionPanel" ng-controller="lessonPromotionPanelController">
+  <section class="content-header">
+    <h1>
+      课程促销
+      <small>课程促销管理</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/admin/"><i class="fa fa-dashboard"></i> 主页</a></li>
+      <li class="active">课程促销</li>
+    </ol>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+
+    <div id="createLessonPromotionRow" class="row collapse">
+      <div class="col-xs-12">
+        <!-- Horizontal Form -->
+        <div class="box box-info">
+          <div class="box-header with-border">
+            <h3 class="box-title">添加课程促销</h3>
+          </div><!-- /.box-header -->
+          <div class="box-body">
+            <!-- form start -->
+            <form class="form-horizontal" name="createLessonPromotionForm" novalidate>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">关联课程</label>
+                <div class="col-sm-10">
+                  <ui-select name="lessonId" ng-model="newLessonPromotion.lessonId" ui-select-required>
+                    <ui-select-match placeholder="没发现课程，请先添加课程">
+                      <span ng-bind="$select.selected.title"></span>
+                    </ui-select-match>
+                    <ui-select-choices repeat="lesson._id as lesson in (lessons | filter: $select.search)">
+                      <span ng-bind="lesson.title"></span>
+                    </ui-select-choices>
+                  </ui-select>
+                  <code ng-show="createLessonPromotionForm.lessonId.$error.uiSelectRequired">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">课程促销名称</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="title" ng-model="newLessonPromotion.title" required>
+                  <code ng-show="createLessonPromotionForm.title.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">价格</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-addon">￥</span>
+                    <input type="number" class="form-control" name="fees" ng-model="newLessonPromotion.fees" required>
+                  </div>
+                  <code ng-show="createLessonPromotionForm.fees.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">开始日期</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <div class="input-group-addon">
+                      <i class="fa fa-calendar"></i>
+                    </div>
+                    <input type="text" class="form-control pull-right" id="newLessonPromotionActivityDate"
+                           name="activityDate"
+                           ng-model="newLessonPromotion.activityDate" required>
+                  </div>
+                  <code ng-show="createLessonPromotionForm.activityDate.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">开启</label>
+                <div class="col-sm-10">
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox" name="inStock" ng-model="newLessonPromotion.inStock">上架
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div><!-- /.box-body -->
+          <div class="box-footer">
+            <button class="btn btn-default" data-toggle="collapse" data-target="#createLessonPromotionRow">
+              取消
+            </button>
+            <button class="btn btn-info pull-right" ng-click='createLessonPromotion();'>添加</button>
+          </div><!-- /.box-footer -->
+        </div><!-- /.box -->
+        <!-- general form elements disabled -->
+      </div><!--/.col (right) -->
+    </div>   <!-- /.row -->
+
+    <div id="modifyLessonPromotionRow" class="row collapse">
+      <div class="col-xs-12">
+        <!-- Horizontal Form -->
+        <div class="box box-warning">
+          <div class="box-header with-border">
+            <h3 class="box-title">修改课程促销</h3>
+          </div><!-- /.box-header -->
+          <div class="box-body">
+            <!-- form start -->
+            <form class="form-horizontal" name="modifyLessonPromotionForm" novalidate>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">课程促销ID</label>
+                <div class="col-sm-10">
+                  <label class="control-label" ng-bind="updatedLessonPromotion.id"></label>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">关联课程</label>
+                <div class="col-sm-10">
+                  <ui-select name="lessonId" ng-model="updatedLessonPromotion.lessonId" ui-select-required>
+                    <ui-select-match placeholder="没发现课程，请先添加课程">
+                      <span ng-bind="$select.selected.title"></span>
+                    </ui-select-match>
+                    <ui-select-choices repeat="lesson._id as lesson in (lessons | filter: $select.search)">
+                      <span ng-bind="lesson.title"></span>
+                    </ui-select-choices>
+                  </ui-select>
+                  <code ng-show="modifyLessonPromotionForm.lessonId.$error.uiSelectRequired">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">课程促销名称</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="title" ng-model="updatedLessonPromotion.title" required>
+                  <code ng-show="modifyLessonPromotionForm.title.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">价格</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-addon">￥</span>
+                    <input type="number" class="form-control" name="fees" ng-model="updatedLessonPromotion.fees" required>
+                  </div>
+                  <code ng-show="modifyLessonPromotionForm.fees.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">开始日期</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <div class="input-group-addon">
+                      <i class="fa fa-calendar"></i>
+                    </div>
+                    <input type="text" class="form-control pull-right" id="updatedLessonPromotionActivityDate"
+                           name="activityDate"
+                           ng-model="updatedLessonPromotion.activityDate" required>
+                  </div>
+                  <code ng-show="modifyLessonPromotionForm.activityDate.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">开启</label>
+                <div class="col-sm-10">
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox" name="inStock" ng-model="updatedLessonPromotion.inStock">上架
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div><!-- /.box-body -->
+          <div class="box-footer">
+            <button class="btn btn-default" data-toggle="collapse" data-target="#modifyLessonPromotionRow">
+              取消
+            </button>
+            <button class="btn btn-warning pull-right" ng-click='modifyLessonPromotion();'>修改</button>
+          </div><!-- /.box-footer -->
+        </div><!-- /.box -->
+        <!-- general form elements disabled -->
+      </div><!--/.col (right) -->
+    </div>   <!-- /.row -->
+
+    <div id="lessonPromotionListRow" class="row">
+      <div class="col-xs-12">
+        <div class="box">
+          <div class="box-header">
+            <h3 class="box-title">课程促销列表</h3>
+            <div class="box-tools pull-right">
+              <button class="btn btn-primary btn-sm" ng-click='showCreateLessonPromotionRow();'>添加课程促销
+              </button>
+            </div>
+          </div><!-- /.box-header -->
+          <div class="box-body">
+            <table id="lessonPromotionListTable" class="table table-bordered table-striped">
+              <thead>
+              <tr>
+                <th>ID</th>
+                <th>关联课程</th>
+                <th>课程促销名称</th>
+                <th>费用</th>
+                <th>活动日期</th>
+                <th>操作</th>
+              </tr>
+              </thead>
+              <tfoot>
+              <tr>
+                <th>ID</th>
+                <th>关联课程</th>
+                <th>课程促销名称</th>
+                <th>费用</th>
+                <th>活动日期</th>
+                <th>操作</th>
+              </tr>
+              </tfoot>
+            </table>
+          </div><!-- /.box-body -->
+        </div><!-- /.box -->
+      </div><!-- /.col -->
+    </div><!-- /.row -->
+
+    <div id="removeLessonPromotionModal" class="modal modal-danger fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">删除课程促销</h4>
+          </div>
+          <div class="modal-body">
+            <p id="removeLessonPromotionModalContent"></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-outline" ng-click='removeLessonPromotion();'>确认</button>
+          </div>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+
+  </section>
+  <!-- /.content -->
+</div>

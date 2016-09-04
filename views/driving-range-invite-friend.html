@@ -1,0 +1,545 @@
+{% extends './layouts/layout_with_backbtn.html' %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="/css/mobiscroll.custom-2.5.0.min.css"/>
+<link rel="stylesheet" href="/css/alertify.core.css"/>
+<link rel="stylesheet" href="/css/alertify.default.css" id="toggleCSS"/>
+{% endblock %}
+
+{% block nav-center %}订单详情{% endblock %}
+{% block nav-right %}{% endblock %}
+
+{% block content %}
+<div data-ng-app="orderDetail" data-ng-controller="orderDetailController">
+  <div id="pb-gsg-booking" class="">
+    <div class="header">
+      <div class="head_c1 head_c2">
+        <div id="pb-gsg-back-booking" data-ng-show="backBtn.show" class="head_l1"><img src="/img/icon_c011.png" width="15"/></div>
+        <div class="head_center1">订单详情</div>
+        <div data-ng-show="homeBtn.show" class="head_r1">
+          <a href="tel:{{ preset.hotline }}">
+            <img src="/img/icon_c021.png" width="28"/></a>
+        </div>
+      </div>
+    </div>
+    <!--================= 头部结束 ====================-->
+    <!--================= 内容开始 ====================-->
+    <div class="mainer" ng-cloak>
+      <form name="booking" method="post" action="" novalidate>
+        <img src="{{ orderDetail.photos[0] }}"/>
+        <input type="hidden" name="orderId" value="{{ orderDetail.orderId.valueOf() }}">
+        <input type="text" name="total" data-ng-model="total" class="collapse">
+
+        <div class="">
+          <div class="txdd_p1 in_tp_p">
+            <i class="in_tp_txt_0">{{ orderDetail.drivingRangeName }}</i><br/>
+            <i class="in_tp_txt_1">{{orderDetail.bookingDate}}</i><br/><br/>
+
+            <i class="">打球人数:&nbsp;</i>
+            <i>
+              <i type="text" name="numberOfPeople" data-ng-bind="numberOfPeople"></i>人
+            </i>
+            {% if isShow == true %}
+            <br/>
+            <i class="">付款类型:&nbsp;</i>
+            <i class="">
+              <i name="paySelectedType" data-ng-bind="paySelectedType"></i>
+            </i>
+            {% endif %}
+          </div>
+          {% if isShow == true %}
+          <div class="in_total_people" data-ng-show="joinRemaining.show">
+            <i>
+              还差
+              <i class="od_tp_it">{% raw %}{{ getRemainedJoinPeople() }}{% endraw %}</i>
+              人, 盼您如南方人盼温暖
+            </i>
+          </div>
+          <div class="in_total_people" data-ng-show="joinRemaining.show == false">
+            <i>
+              <i class="od_tp_it_en">参团人数已足够</i>
+            </i>
+          </div>
+          {% endif %}
+          <div class="in_rm_time" data-ng-show="countDownArea.show">
+            <i>剩余</i>
+            <i class = "in_rm_p_t">&nbsp;{% raw %}{{ countdown.days }}{% endraw %}&nbsp;</i>&nbsp;:
+            <i class = "in_rm_p_t">&nbsp;{% raw %}{{ countdown.hours }}{% endraw %}&nbsp;</i>&nbsp;:
+            <i class = "in_rm_p_t">&nbsp;{% raw %}{{ countdown.minutes }}{% endraw %}&nbsp;</i>&nbsp;:
+            <i class = "in_rm_p_t">&nbsp;{% raw %}{{ countdown.seconds }}{% endraw %}&nbsp;</i>
+            <i>结束</i>
+          </div>
+          {% for user in orderDetail.userList %}
+          <div class = "in_ul_cell">
+            <img class="in_ul_cell_img" src="{{user.avatar}}" />
+            <i class="in_ul_cell_txt_1">{{user.nickName}}</i>
+            <i class="in_ul_cell_txt_2">{{user.payState}}</i>
+            <i class="in_ul_cell_txt_3">{{user.createDate}}</i>
+          </div>
+          {% endfor %}
+          <div class="in_rm_p" data-ng-show="paidRemaining.show">
+            <i>
+              还有
+              <i class="">{% raw %}{{ getRemainedPayPeople() }}{% endraw %}</i>
+              人, 未支付
+            </i>
+          </div>
+          <div class="od_state" data-ng-show="stateProgress.show">
+            <div>
+              <i ng-class="{true:'od_state_txt_h' , false: 'od_state_txt_n'}[state1]">选择打球&nbsp;&nbsp;</i>
+              <i id="confirm_state_0" ng-class="{true:'od_state_txt_h' , false: 'od_state_txt_n'}[state2]"></i>
+              <i id="pay_state_0" ng-class="{true:'od_state_txt_h' , false: 'od_state_txt_n'}[state3]"></i>
+              <i ng-class="{true:'od_state_txt_h' , false: 'od_state_txt_n'}[state4]">订场&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</i>
+            </div>
+            <div>
+              <i ng-class="{true:'od_state_txt_h' , false: 'od_state_txt_n'}[state1]">地点与时间</i>
+              <i id="confirm_state_1" ng-class="{true:'od_state_txt_h' , false: 'od_state_txt_n'}[state2]"></i>
+              <i id="pay_state_1" ng-class="{true:'od_state_txt_h' , false: 'od_state_txt_n'}[state3]"></i>
+              <i ng-class="{true:'od_state_txt_h' , false: 'od_state_txt_n'}[state4]">成功&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</i>
+            </div>
+            <div class="od_state_progress">
+              <img class="od_state_img" data-ng-src="{% raw %}{{ progressImg }}{% endraw %}"/>
+            </div>
+          </div>
+          <div class = "od_can_m" data-ng-show="cancelTxt.show">
+            <i class="od_can_1">当前订单已取消</i>
+          </div>
+          <div class="od_total_price">
+            <i>
+              总价:￥
+              <i class="od_tp_1">{% raw %}{{ getCourseFee() }}{% endraw %}</i>
+              <i>/人 x </i>
+              <i class="od_tp_1">{% raw %}{{ getNumberOfPeople() }}{% endraw %}</i>
+              <i>人 =￥</i>
+              <i class="od_tp_1">{% raw %}{{ getTotal() }}{% endraw %}</i>
+            </i>
+          </div>
+          <div class="od_total_price" data-ng-show="mushPay.show">
+            <i>
+              您应付:￥
+              <i class="od_tp_1">{% raw %}{{ getMushPay() }}{% endraw %}</i>
+            </i>
+          </div>
+          <div class="ht10"></div>
+          <div class="txdd_p7">
+            {% if wpParams %}
+            <button id="btn-wppay" type="button" class="btn-wechat-pay" ng-show='payBtn.show'>微信支付</button>
+            {% else %}
+            <button type="button" class="btn-wechat-pay" ng-show='payBtn.show' data-ng-click="pay()">测试支付</button>
+            {% endif %}
+          </div>
+          <div class="txdd_p7">
+            <button type="button" class="od_bt_update" ng-show='joinBtn.show' data-ng-click="join()">我要参团</button>
+          </div>
+          <div class="txdd_p7">
+            <button type="button" class="od_bt_update" ng-show='inviteBtn.show' data-ng-click="invite()">邀请好友</button>
+          </div>
+          <div class="txdd_p7">
+            <button type="button" class="qd_yd" ng-show='cancelBtn.show' data-ng-click="cancel()">取消订单</button>
+          </div>
+          <div class="od_ref" data-ng-show="refNum.show">
+            <i class="od_ref_1">您的订单号是</i>
+            <i class="od_ref_2">{{ orderDetail.refId }}</i>
+          </div>
+          <br>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+{% if wpParams %}
+<script>
+
+  function onBridgeReady(){
+    WeixinJSBridge.invoke('getBrandWCPayRequest', {{ wpParams|json|safe }}, function(res){
+      if(res.err_msg == "get_brand_wcpay_request:ok") {
+        self.location.reload(true);
+      }
+    });
+  }
+
+  $("#btn-wppay").click(function(){
+    if (typeof WeixinJSBridge == "undefined"){
+      if( document.addEventListener ){
+        document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+      }else if (document.attachEvent){
+        document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+        document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+      }
+    }else{
+      onBridgeReady();
+    }
+  });
+</script>
+{% endif %}
+<script src="/js/mobiscroll.custom-2.5.0.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/angular-1.4.8-min.js"></script>
+<script src="/js/alertify.min.js"></script>
+<script type="text/javascript">
+
+  function reset() {
+    $("#toggleCSS").attr("href", "/css/alertify.default.css");
+    alertify.set({
+      labels: {
+        ok: "确定",
+        cancel: "取消"
+      },
+      delay: 5000,
+      buttonReverse: false,
+      buttonFocus: "确定"
+    });
+  }
+
+  $('#pb-gsg-back-booking').click(function () {
+    self.location.href = "/order";
+  });
+
+
+  var fees = {{orderDetail.fees | safe}};
+  var numberOfPeople = {{orderDetail.numberOfPeople}};
+  var drivingRangeOrderState = {{orderDetail.drivingRangeOrderState}};
+  var orderState = {{orderDetail.orderState}};
+  var orderId = "{{ orderDetail.orderId.valueOf() }}";
+  var payType = {{orderDetail.payType}};
+  var paidNumOfPeople = {{orderDetail.paidNumOfPeople}};
+  var joinedNumPeople = {{orderDetail.joinedNumPeople}};
+  var refNum = {{ orderDetail.refId }};
+  var isOwner = {{isOwner}};
+
+  var expiredDate = "{{orderDetail.expiredDate}}";
+  var tmpBeginTime = new Date(); //时间转换
+  var tmpEndTime = new Date(expiredDate.replace(/-/g, "\/")); //时间转换
+
+  var app = angular.module('orderDetail', []);
+
+  app.controller('orderDetailController', function ($scope, $http) {
+    $scope.total = fees * numberOfPeople;
+    $scope.numberOfPeople = numberOfPeople;
+    $scope.fees = fees / 100;
+    $scope.submitted = false;
+
+    $scope.stateImg = true;
+
+    $scope.paySelectedType = payType == 0 ? "团长全款" : "AA付款";
+
+    $scope.inviteBtn = {show: false};
+    $scope.payBtn = {show: false};
+    $scope.cancelBtn = {show: false};
+    $scope.joinBtn = {show:false};
+    $scope.homeBtn = {show:false};
+    $scope.backBtn = {show:false};
+
+    $scope.paidRemaining = {show:false};
+    $scope.joinRemaining = {show: (numberOfPeople - joinedNumPeople > 0 )};
+    $scope.refNum = {show: refNum >0};
+    $scope.mushPay = {show:false};
+
+    $scope.stateProgress = {show:false};
+    $scope.cancelTxt = {show:false};
+
+    $scope.countdown = {days:"", hours:"", minutes:"", seconds:""};
+    $scope.countDownArea = {show:false};
+
+    updateState (drivingRangeOrderState);
+
+    if (drivingRangeOrderState < 3) {
+      var countDown = tmpEndTime.getTime() - tmpBeginTime.getTime();
+      var timeOut = countDown;
+
+      var myTime = setInterval(function() {
+        calculateTime();
+        $scope.$digest(); // 通知视图模型的变化
+      }, 1000);
+
+      setTimeout(function() {
+        clearInterval(myTime);
+        $scope.countdown.$destroy();
+      }, timeOut);
+    }
+
+
+    var calculateTime = function () {
+      //计算出小时数
+      countDown -= 1000;
+
+      var days=Math.floor(countDown/(24*3600*1000))
+      var daysStr = days < 10 ? ("0"+days) : days;
+
+      var leave1=countDown%(24*3600*1000);   //计算天数后剩余的毫秒数
+      var hours=Math.floor(leave1/(3600*1000));
+      var hoursStr = hours < 10 ? ("0"+hours) : hours;
+
+      //计算相差分钟数
+      var leave2=leave1%(3600*1000);        //计算小时数后剩余的毫秒数
+      var minutes=Math.floor(leave2/(60*1000));
+      var minutesStr = minutes < 10 ? ("0"+minutes) : minutes;
+
+      //计算相差秒数
+      var leave3=leave2%(60*1000);      //计算分钟数后剩余的毫秒数
+      var seconds=Math.round(leave3/1000);
+      var secondsStr = seconds < 10 ? ("0"+seconds) : seconds;
+
+      $scope.countdown.days = daysStr;
+      $scope.countdown.hours = hoursStr;
+      $scope.countdown.minutes = minutesStr;
+      $scope.countdown.seconds = secondsStr;
+    };
+
+    $scope.getTotal = function () {
+      return ($scope.total / 100).toFixed(2);
+    };
+
+    $scope.getCourseFee = function () {
+      return $scope.fees;
+    };
+
+    $scope.getNumberOfPeople = function () {
+      return $scope.numberOfPeople;
+    };
+
+    $scope.getRemainedJoinPeople = function () {
+      var str = (numberOfPeople - joinedNumPeople)+"";
+      return str;
+    };
+
+    $scope.getRemainedPayPeople = function () {
+      var str = "";
+      if (payType == 1) {
+        var numStr = joinedNumPeople - paidNumOfPeople;
+        str = numStr > 0 ? numStr.toString() : "";
+      }
+
+      $scope.paidRemaining.show = str.length > 0;
+
+      return str;
+    };
+
+    $scope.getMushPay = function () {
+      var paidTotal = 0;
+
+      if (payType == 0) {
+        paidTotal = ($scope.total / 100 ).toFixed(2);
+      } else {
+        paidTotal = ($scope.total / 100 / $scope.numberOfPeople).toFixed(2);
+      }
+
+      return paidTotal;
+    };
+
+    $scope.cancel = function () {
+      if (!$scope.booking.$valid) {
+        $scope.submitted = true;
+      } else {
+        reset();
+        alertify.confirm("确定取消订单?", function (e) {
+          if (e) {
+            var formData = {
+              orderId: "{{ orderDetail.orderId.valueOf() }}"
+            };
+
+            var url = "/order/drivingrange/cancel";
+
+            postForm(formData, url, function (data) {
+              reset();
+              if (data == "success") {
+                self.location.href = "/order";
+              } else {
+                alertify.alert("取消出错了");
+              }
+            });
+          } else {
+
+          }
+        });
+      }
+    };
+
+    $scope.join = function () {
+      var formData = {
+        realOrderId: "{{ orderDetail.realOrderId.valueOf() }}"
+      };
+
+      var url = "/order/drivingrange/join";
+
+      postForm(formData, url, function (data) {
+        reset();
+        if (data.msg == "complete") {
+          alertify.alert("订单已完成");
+          self.location.href = "/order/detail/drivingrange/" + data.orderId;
+        } else if (data.msg == "joinGroup") {
+          alertify.alert("参团成功");
+          self.location.href = "/order/detail/drivingrange/" + data.orderId;
+        } else if (data.msg == "full") {
+          alertify.alert("参团人数已达上限");
+        } else if (data.msg == "existed") {
+          alertify.alert("不能重复参团");
+        } else {
+          alertify.alert("参团出错啦");
+        }
+      });
+    };
+
+    $scope.pay = function () {
+      var formData = {
+        orderId: "{{ orderDetail.orderId.valueOf() }}"
+      };
+
+      var url = "/order/pay";
+
+      postForm(formData, url, function (data) {
+        reset();
+        if (data.msg == "complete") {
+          alertify.alert("订单已完成");
+          self.location.reload(true);
+        } else if (data.msg == "paid") {
+          alertify.alert("支付完成");
+          self.location.reload(true);
+        } else {
+          alertify.alert("支付出错了");
+        }
+      });
+    };
+
+    $scope.invite = function () {
+
+    };
+
+    function postForm(data, url, callback) {
+      $http({
+        method: 'PUT',
+        url: url,
+        data: $.param(data),  // pass in data as strings
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
+      }).success(function (data) {
+        callback(data);
+      });
+    };
+
+    function updateState (newState) {
+      drivingRangeOrderState = newState;
+
+      if (drivingRangeOrderState > 3) {
+        //$scope.joinBtn.show = false;
+        $scope.backBtn.show = true;
+        $scope.homeBtn.show = false;
+        //$scope.inviteBtn.show = false;
+        $scope.payBtn.show = false;
+        $scope.cancelBtn.show = false;
+
+        $scope.stateProgress.show = false;
+        $scope.cancelTxt.show = true;
+
+        $scope.countDownArea.show = false;
+
+        if (payType == 0) {
+          $scope.mushPay.show = isOwner ? true : false;
+        } else {
+          $scope.mushPay.show = true;
+        }
+      } else {
+        //$scope.joinBtn.show = orderState == 0 && drivingRangeOrderState != 3 ;
+        $scope.backBtn.show = orderState != 0;
+        $scope.homeBtn.show = orderState != 0;
+        //$scope.inviteBtn.show = orderState >= 1 && drivingRangeOrderState != 3 ;
+        $scope.cancelBtn.show = orderState < 3 && isOwner == true && payType == 0;
+
+        $scope.stateProgress.show = true;
+        $scope.cancelTxt.show = false;
+
+        $scope.countDownArea.show = orderState < 3 && drivingRangeOrderState != 3;
+
+        if (orderState == 1) {
+          if (payType == 0 ) {
+            $scope.payBtn.show = isOwner ? true : false;
+          } else {
+            $scope.payBtn.show = true;
+          }
+        } else {
+          $scope.payBtn.show = false;
+        }
+
+        if (payType == 0) {
+          $scope.mushPay.show = isOwner ? true : false;
+        } else {
+          $scope.mushPay.show = true;
+        }
+
+        var stateStr = drivingRangeOrderState > 0 ? "球场&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" : "等待球场&nbsp;&nbsp;";
+        document.getElementById('confirm_state_0').innerHTML = stateStr;
+
+        stateStr = drivingRangeOrderState > 0 ? "已确认&nbsp;&nbsp;&nbsp;&nbsp;" : "确认&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+        document.getElementById("confirm_state_1").innerHTML = stateStr;
+
+        stateStr = drivingRangeOrderState > 1 ? "支付&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" :  "等待&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+        document.getElementById("pay_state_0").innerHTML = stateStr;
+
+        stateStr = drivingRangeOrderState > 1 ? "成功&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" : "支付&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+        document.getElementById("pay_state_1").innerHTML = stateStr;
+
+        $scope.state1 = drivingRangeOrderState > -1;
+        $scope.state2 = drivingRangeOrderState > 0;
+        $scope.state3 = drivingRangeOrderState > 1;
+        $scope.state4 = drivingRangeOrderState > 2;
+
+        var imgPath = "/img/";
+
+        if (drivingRangeOrderState == 0) {
+          imgPath += "img_prg_0.png";
+        } else if (drivingRangeOrderState == 1) {
+          imgPath += "img_prg_1.png";
+        } else if (drivingRangeOrderState == 2) {
+          imgPath += "img_prg_2.png";
+        } else if (drivingRangeOrderState == 3) {
+          imgPath += "img_prg_3.png";
+        }
+
+        $scope.progressImg = imgPath;
+      }
+
+
+    }
+  });
+</script>
+{% if wechatConfig %}
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script>
+  var config = {{ wechatConfig|json|safe }};
+  var shareMessage = {{ shareMessage|json|safe }};
+
+  wx.config({
+    debug: false,
+    appId: config.appId,
+    timestamp: config.timestamp,
+    nonceStr: config.nonceStr,
+    signature: config.signature,
+    jsApiList: ['onMenuShareTimeline', 'onMenuShareAppMessage']
+  });
+
+  wx.ready(function() {
+    wx.onMenuShareTimeline({
+      title: shareMessage.title,
+      link: shareMessage.link,
+      imgUrl: shareMessage.imgUrl,
+      success: function () {
+      },
+      cancel: function () {
+      }
+    });
+
+    wx.onMenuShareAppMessage({
+      title: shareMessage.title,
+      desc: shareMessage.desc,
+      link: shareMessage.link,
+      imgUrl: shareMessage.imgUrl,
+      success: function () {
+      },
+      cancel: function () {
+      }
+    });
+  });
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends './layouts/layout_with_backbtn.html' %}
+
+{% block head %}
+<style type="text/css">
+  .head_td_cell_center {
+    margin-left: 70px;
+  }
+
+  .head_td_cell_right {
+    float: right;
+    margin-right: 15px;
+  }
+
+  .user_num {
+    text-align: center;
+    padding: 6px 0;
+  }
+
+</style>
+{% endblock %}
+
+{% block nav-left %}
+<div class="head_l1 custom-back-btn"><img src="/img/icon_c011.png" width="15"/></div>
+{% endblock %}
+{% block nav-center %}
+我的球友
+{% endblock %}
+{% block content %}
+<div class="mainer" data-ng-app="userlist" data-ng-controller="userlistController">
+  <div class="head_td_title">
+    <i class="head_td_cell_center">好友名称</i>
+    <i class="head_td_cell_right">关注日期</i>
+  </div>
+  {% raw %}
+  <div class="in_ul_cell" data-ng-repeat="user in users" data-ng-cloak>
+    <img class="in_ul_cell_img" data-ng-src="{{ user.avatar }}">
+    <i class="in_ul_cell_txt_1">{{ user.nickname }}</i>
+    <i class="in_ul_cell_txt_3">{{ getDate(user.followedDate) }}</i>
+  </div>
+  <p class="user_num" data-ng-cloak>您共有 {{ users.length }} 位球友</p>
+  {% endraw %}
+</div>
+{% endblock %}
+{% block footer %}
+<script src="/js/angular-1.4.8-min.js"></script>
+<script src="http://cdn.bootcss.com/moment.js/2.11.2/moment.min.js"></script>
+<script type="text/javascript">
+  $(".custom-back-btn").click(function(){
+    self.location.href = '/user';
+  });
+
+  var users = {{ users|json|safe }};
+
+  var app = angular.module('userlist', []);
+
+  app.controller('userlistController', function ($scope) {
+    $scope.users = users;
+
+    $scope.getDate = function(date){
+      if(date) {
+        return moment(date).format('YYYY年MM月DD日');
+      }
+      return '';
+    };
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends './layouts/layout_with_sidemenu.html' %}
+
+{% block head %}
+{% endblock %}
+{% block content %}
+
+<div class="mainer">
+  <div class="user-container">
+    <div>
+      <div><img class="user-image-title" src="/img/icon_c032.png"/></div>
+      <img class="user-image" src="{% if user.avatar %}{{ user.avatar }}{% else %}/img/icon_c033.png{% endif %}"/>
+    </div>
+    <h2>{{ user.nickname }}</h2>
+  </div>
+  <div class="user-function-list">
+    <div class="user-function-cell">
+      <a href="/order"><img class="cell-img-icon" src="/img/icon_c034.png"/>
+        <i class="cell-i-1">我的订单</i>
+        <img class="cell-img-arrow" src="/img/icon_c037.png"/>
+        <i class="cell-i-2">查看全部订单</i>
+      </a>
+    </div>
+    <!--{% if user.isMaster == true %}-->
+    <!--<div class="user-function-cell">-->
+      <!--<a href="/user/referee"><img class="cell-img-icon" src="/img/icon_c034.png"/>-->
+        <!--<i class="cell-i-1">我的球友</i>-->
+        <!--<img class="cell-img-arrow" src="/img/icon_c037.png"/>-->
+        <!--<i class="cell-i-2">查看全部球友</i>-->
+      <!--</a>-->
+    <!--</div>-->
+    <!--<div class="user-function-cell">-->
+      <!--<a href="/user/referee/poster"><img class="cell-img-icon" src="/img/icon_c034.png"/>-->
+        <!--<i class="cell-i-1">我的海报</i>-->
+        <!--<img class="cell-img-arrow" src="/img/icon_c037.png"/>-->
+        <!--<i class="cell-i-2">查看推广海报</i>-->
+      <!--</a>-->
+    <!--</div>-->
+    <!--{% endif %}-->
+    {% if false %}
+    <div class="user-function-cell">
+      <a href="#"><img class="cell-img-icon" src="/img/icon_c035.png"/>
+        <i class="cell-i-1">我的券</i>
+        <img class="cell-img-arrow" src="/img/icon_c037.png"/>
+      </a>
+    </div>
+    <div class="user-function-cell">
+      <a href="#"><img class="cell-img-icon" src="/img/icon_c036.png"/>
+        <i class="cell-i-1">我的课程</i>
+        <img class="cell-img-arrow" src="/img/icon_c037.png"/>
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

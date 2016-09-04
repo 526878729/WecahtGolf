@@ -1,0 +1,675 @@
+<!-- Content Header (Page header) -->
+<div id="drivingRangePanel" ng-controller="drivingRangePanelController">
+  <section class="content-header">
+    <h1>
+      练习场
+      <small>练习场管理</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/admin/"><i class="fa fa-dashboard"></i> 主页</a></li>
+      <li class="active">练习场</li>
+    </ol>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+    <div id="createDrivingRangeRow" class="row collapse">
+      <div class="col-xs-12">
+        <!-- Horizontal Form -->
+        <div class="box box-info">
+          <div class="box-header with-border">
+            <h3 class="box-title">添加练习场</h3>
+          </div><!-- /.box-header -->
+          <div class="box-body">
+            <!-- form start -->
+            <form class="form-horizontal" name="createDrivingRangeForm" novalidate>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">练习场图片</label>
+                <div class="col-sm-10">
+                  <input type="file" id="newDrivingRangePhoto">
+                  <img id="newDrivingRangePhotoPreview"/>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">练习场名称</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="name" ng-model="newDrivingRange.name" required>
+                  <code ng-show="createDrivingRangeForm.name.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">简称</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="nickname" ng-model="newDrivingRange.nickname" required>
+                  <code ng-show="createDrivingRangeForm.nickname.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">练习场模式</label>
+                <div class="col-sm-10">
+                  <ui-select multiple tagging tagging-label="自定义类型" name="type" ng-model="newDrivingRange.type"
+                             ui-select-required>
+                    <ui-select-match>
+                      <span ng-bind="$item"></span>
+                    </ui-select-match>
+                    <ui-select-choices repeat="newDrivingRangeType in newDrivingRangeTypes | filter:$select.search">
+                      <span ng-bind="newDrivingRangeType"></span>
+                    </ui-select-choices>
+                  </ui-select>
+                  <code ng-show="createDrivingRangeForm.type.$error.uiSelectRequired">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">建立时间</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <div class="input-group-addon">
+                      <i class="fa fa-calendar"></i>
+                    </div>
+                    <input type="text" class="form-control pull-right" id="newDrivingRangeEstablishedDate"
+                           name="establishedDate"
+                           ng-model="newDrivingRange.establishedDate" required>
+                  </div>
+                  <code ng-show="createDrivingRangeForm.establishedDate.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">练习场面积</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-addon">亩</span>
+                    <input type="number" class="form-control" name="acreage" ng-model="newDrivingRange.acreage" required>
+                  </div>
+                  <code ng-show="createDrivingRangeForm.acreage.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">果岭草种</label>
+                <div class="col-sm-10">
+                  <ui-select multiple tagging tagging-label="自定义类型" name="puttingGreenGrass"
+                             ng-model="newDrivingRange.puttingGreenGrass" ui-select-required>
+                    <ui-select-match>
+                      <span ng-bind="$item"></span>
+                    </ui-select-match>
+                    <ui-select-choices
+                        repeat="newDrivingRangePuttingGreenGrass in newDrivingRangePuttingGreenGrasses | filter:$select.search">
+                      <span ng-bind="newDrivingRangePuttingGreenGrass"></span>
+                    </ui-select-choices>
+                  </ui-select>
+                  <code ng-show="createDrivingRangeForm.puttingGreenGrass.$error.uiSelectRequired">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">练习场数据</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-addon">洞</span>
+                    <input type="number" class="form-control" name="holes" ng-model="newDrivingRange.holes" required>
+                    <span class="input-group-addon">杆</span>
+                    <input type="number" class="form-control" name="par" ng-model="newDrivingRange.par" required>
+                  </div>
+                  <code ng-show="createDrivingRangeForm.holes.$error.required || createDrivingRangeForm.par.$error.required">
+                    必填
+                  </code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">设计师</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="designer" ng-model="newDrivingRange.designer" required>
+                  <code ng-show="createDrivingRangeForm.designer.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">球道长度</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-addon">码</span>
+                    <input type="number" class="form-control" name="yardage" ng-model="newDrivingRange.yardage" required>
+                  </div>
+                  <code ng-show="createDrivingRangeForm.yardage.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">球道草种</label>
+                <div class="col-sm-10">
+                  <ui-select multiple tagging tagging-label="自定义类型" name="fairwayGrass"
+                             ng-model="newDrivingRange.fairwayGrass" ui-select-required>
+                    <ui-select-match>
+                      <span ng-bind="$item"></span>
+                    </ui-select-match>
+                    <ui-select-choices
+                        repeat="newDrivingRangeFairwayGrass in newDrivingRangeFairwayGrasses | filter:$select.search">
+                      <span ng-bind="newDrivingRangeFairwayGrass"></span>
+                    </ui-select-choices>
+                  </ui-select>
+                  <code ng-show="createDrivingRangeForm.fairwayGrass.$error.uiSelectRequired">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">地址</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="address" ng-model="newDrivingRange.address" required>
+                  <code ng-show="createDrivingRangeForm.address.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">练习场电话</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="phoneNumber" ng-model="newDrivingRange.phoneNumber" required>
+                  <code ng-show="createDrivingRangeForm.phoneNumber.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">练习场简介</label>
+                <div class="col-sm-10">
+                  <textarea class="form-control" rows="3" name="introduction"
+                            ng-model="newDrivingRange.introduction" required></textarea>
+                  <code ng-show="createDrivingRangeForm.introduction.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">定位</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-addon">经</span>
+                    <input type="number" class="form-control" name="longitude" ng-model="newDrivingRange.longitude" required>
+                    <span class="input-group-addon">纬</span>
+                    <input type="number" class="form-control" name="latitude" ng-model="newDrivingRange.latitude" required>
+                  </div>
+                  <code
+                      ng-show="createDrivingRangeForm.longitude.$error.required || createDrivingRangeForm.latitude.$error.required">
+                    必填
+                  </code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">官方练习场</label>
+                <div class="col-sm-10">
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox" name="official" ng-model="newDrivingRange.official"> 官方自营练习场
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">优先级</label>
+                <div class="col-sm-10">
+                  <ui-select name="priority" ng-model="newDrivingRange.priority" ui-select-required>
+                    <ui-select-match>
+                      <span ng-bind="$select.selected"></span>
+                    </ui-select-match>
+                    <ui-select-choices repeat="priority in (priorities | filter: $select.search)">
+                      <span ng-bind="priority"></span>
+                    </ui-select-choices>
+                  </ui-select>
+                  <code ng-show="createDrivingRangeForm.priority.$error.uiSelectRequired">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">可预订开始时间</label>
+                <div class="col-sm-10">
+                  <div class="input-group bootstrap-timepicker timepicker">
+                    <div class="input-group-addon">
+                      <i class="fa fa-clock-o"></i>
+                    </div>
+                    <input type="text" autocomplete="off" class="form-control"
+                           id="newDrivingRangeTeeTimesStart" name="teeTimesStart"
+                           ng-model="newDrivingRange.teeTimesStart" required>
+                  </div>
+                  <code ng-show="createDrivingRangeForm.teeTimesStart.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">可预订结束时间</label>
+                <div class="col-sm-10">
+                  <div class="input-group bootstrap-timepicker timepicker">
+                    <div class="input-group-addon">
+                      <i class="fa fa-clock-o"></i>
+                    </div>
+                    <input type="text" autocomplete="off" class="form-control"
+                           id="newDrivingRangeTeeTimesEnd" name="teeTimesEnd"
+                           ng-model="newDrivingRange.teeTimesEnd" required>
+                  </div>
+                  <code ng-show="createDrivingRangeForm.teeTimesEnd.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">可提前预约开始天数</label>
+                <div class="col-sm-10">
+                  <input type="number" class="form-control" name="advanceReservationStart"
+                         ng-model="newDrivingRange.advanceReservationStart" required>
+                  <code ng-show="createDrivingRangeForm.advanceReservationStart.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">可提前预约结束天数</label>
+                <div class="col-sm-10">
+                  <input type="number" class="form-control" name="advanceReservationEnd"
+                         ng-model="newDrivingRange.advanceReservationEnd" required>
+                  <code ng-show="createDrivingRangeForm.advanceReservationEnd.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">价格</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-addon">￥</span>
+                    <input type="number" class="form-control" name="fees" ng-model="newDrivingRange.fees" required>
+                  </div>
+                  <code ng-show="createDrivingRangeForm.fees.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">返现</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-addon">￥</span>
+                    <input type="number" class="form-control" name="rebate" ng-model="newDrivingRange.rebate" required>
+                  </div>
+                  <code ng-show="createDrivingRangeForm.rebate.$error.required">必填</code>
+                </div>
+              </div>
+              <!--退款部分开始-->
+
+              <!--<div class="form-group">-->
+                <!--<label class="col-sm-2 control-label">退款规则</label>-->
+                <!--<div class="col-sm-10">-->
+                  <!--<div class="input-group" ng-repeat="(key,item) in refundElementList  track by $index">-->
+                    <!--<span class="input-group-addon">天数</span>-->
+                    <!--&lt;!&ndash;<input type="number" class="form-control" name="refundDay" ng-model="newDrivingRange.refundDay[key]" required>&ndash;&gt;-->
+                    <!--<input type="number" class="form-control" name="refundDay" ng-model="newDrivingRange.refundRule[key].refundDay" required>-->
+                    <!--<span class="input-group-addon">款数百分比</span>-->
+                    <!--&lt;!&ndash;<input type="number" class="form-control" name="refundPercent" ng-model="newDrivingRange.refundPercent[key]" required>&ndash;&gt;-->
+                    <!--<input type="number" class="form-control" name="refundType" ng-model="newDrivingRange.refundRule[key].refundType" required>-->
+                    <!--<span class="input-group-addon">{{ refundType }}</span>-->
+                    <!--<div class="input-group-btn">-->
+                        <!--<button class="btn btn-danger btn-sm" ng-click="deleteRefundRule(key)">-</button>-->
+                    <!--</div>-->
+
+                  <!--</div>-->
+                  <!--<code-->
+                          <!--ng-show="createDrivingRangeForm.refundDay.$error.required || createDrivingRangeForm.refundType.$error.required">-->
+                    <!--必填-->
+                  <!--</code>-->
+                  <!--<button class="btn btn-info pull-right" ng-click='changRefundType()'>更改退款类型</button>-->
+
+                  <!--<button class="btn btn-info pull-center" ng-click='addRefundRule()'>增加规则</button>-->
+                <!--</div>-->
+
+              <!--</div>-->
+
+              <!--退款部分结束-->
+              <div class="form-group">
+                <label class="col-sm-2 control-label">开启</label>
+                <div class="col-sm-10">
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox" name="enabled" ng-model="newDrivingRange.enabled">激活
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div><!-- /.box-body -->
+          <div class="box-footer">
+            <button class="btn btn-default" data-toggle="collapse" data-target="#createDrivingRangeRow">
+              取消
+            </button>
+            <button class="btn btn-info pull-right" ng-click='createDrivingRange();'>添加</button>
+          </div><!-- /.box-footer -->
+        </div><!-- /.box -->
+        <!-- general form elements disabled -->
+      </div><!--/.col (right) -->
+    </div>   <!-- /.row -->
+
+    <div id="modifyDrivingRangeRow" class="row collapse">
+      <div class="col-xs-12">
+        <!-- Horizontal Form -->
+        <div class="box box-warning">
+          <div class="box-header with-border">
+            <h3 class="box-title">修改练习场</h3>
+          </div><!-- /.box-header -->
+          <div class="box-body">
+            <!-- form start -->
+            <form class="form-horizontal" name="modifyDrivingRangeForm" novalidate>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">练习场ID</label>
+                <div class="col-sm-10">
+                  <label class="control-label" ng-bind="updatedDrivingRange.id"></label>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">练习场图片</label>
+                <div class="col-sm-10">
+                  <input type="file" id="updatedDrivingRangePhoto">
+                  <img id="updatedDrivingRangePhotoPreview"/>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">练习场名称</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="name" ng-model="updatedDrivingRange.name" required>
+                  <code ng-show="modifyDrivingRangeForm.name.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">简称</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="nickname" ng-model="updatedDrivingRange.nickname" required>
+                  <code ng-show="modifyDrivingRangeForm.nickname.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">练习场模式</label>
+                <div class="col-sm-10">
+                  <ui-select multiple tagging tagging-label="自定义类型" name="type" ng-model="updatedDrivingRange.type"
+                             ui-select-required>
+                    <ui-select-match>
+                      <span ng-bind="$item"></span>
+                    </ui-select-match>
+                    <ui-select-choices repeat="updatedDrivingRangeType in updatedDrivingRangeTypes | filter:$select.search">
+                      <span ng-bind="updatedDrivingRangeType"></span>
+                    </ui-select-choices>
+                  </ui-select>
+                  <code ng-show="modifyDrivingRangeForm.type.$error.uiSelectRequired">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">建立时间</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <div class="input-group-addon">
+                      <i class="fa fa-calendar"></i>
+                    </div>
+                    <input type="text" class="form-control pull-right" id="updatedDrivingRangeEstablishedDate"
+                           name="establishedDate"
+                           ng-model="updatedDrivingRange.establishedDate" required>
+                  </div>
+                  <code ng-show="modifyDrivingRangeForm.establishedDate.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">练习场面积</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-addon">亩</span>
+                    <input type="number" class="form-control" name="acreage" ng-model="updatedDrivingRange.acreage" required>
+                  </div>
+                  <code ng-show="modifyDrivingRangeForm.acreage.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">果岭草种</label>
+                <div class="col-sm-10">
+                  <ui-select multiple tagging tagging-label="自定义类型" name="puttingGreenGrass"
+                             ng-model="updatedDrivingRange.puttingGreenGrass" ui-select-required>
+                    <ui-select-match>
+                      <span ng-bind="$item"></span>
+                    </ui-select-match>
+                    <ui-select-choices
+                        repeat="updatedDrivingRangePuttingGreenGrass in updatedDrivingRangePuttingGreenGrasses | filter:$select.search">
+                      <span ng-bind="updatedDrivingRangePuttingGreenGrass"></span>
+                    </ui-select-choices>
+                  </ui-select>
+                  <code ng-show="modifyDrivingRangeForm.puttingGreenGrass.$error.uiSelectRequired">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">练习场数据</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-addon">洞</span>
+                    <input type="number" class="form-control" name="holes" ng-model="updatedDrivingRange.holes" required>
+                    <span class="input-group-addon">杆</span>
+                    <input type="number" class="form-control" name="par" ng-model="updatedDrivingRange.par" required>
+                  </div>
+                  <code ng-show="modifyDrivingRangeForm.holes.$error.required || modifyDrivingRangeForm.par.$error.required">
+                    必填
+                  </code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">设计师</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="designer" ng-model="updatedDrivingRange.designer" required>
+                  <code ng-show="modifyDrivingRangeForm.designer.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">球道长度</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-addon">码</span>
+                    <input type="number" class="form-control" name="yardage" ng-model="updatedDrivingRange.yardage" required>
+                  </div>
+                  <code ng-show="modifyDrivingRangeForm.yardage.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">球道草种</label>
+                <div class="col-sm-10">
+                  <ui-select multiple tagging tagging-label="自定义类型" name="fairwayGrass"
+                             ng-model="updatedDrivingRange.fairwayGrass" ui-select-required>
+                    <ui-select-match>
+                      <span ng-bind="$item"></span>
+                    </ui-select-match>
+                    <ui-select-choices
+                        repeat="updatedDrivingRangeFairwayGrass in updatedDrivingRangeFairwayGrasses | filter:$select.search">
+                      <span ng-bind="updatedDrivingRangeFairwayGrass"></span>
+                    </ui-select-choices>
+                  </ui-select>
+                  <code ng-show="modifyDrivingRangeForm.fairwayGrass.$error.uiSelectRequired">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">地址</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="address" ng-model="updatedDrivingRange.address" required>
+                  <code ng-show="modifyDrivingRangeForm.address.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">练习场电话</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="phoneNumber" ng-model="updatedDrivingRange.phoneNumber"
+                         required>
+                  <code ng-show="modifyDrivingRangeForm.phoneNumber.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">练习场简介</label>
+                <div class="col-sm-10">
+              <textarea class="form-control" rows="3" name="introduction"
+                        ng-model="updatedDrivingRange.introduction" required></textarea>
+                  <code ng-show="modifyDrivingRangeForm.introduction.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">定位</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-addon">经</span>
+                    <input type="number" class="form-control" name="longitude" ng-model="updatedDrivingRange.longitude"
+                           required>
+                    <span class="input-group-addon">纬</span>
+                    <input type="number" class="form-control" name="latitude" ng-model="updatedDrivingRange.latitude" required>
+                  </div>
+                  <code
+                      ng-show="modifyDrivingRangeForm.longitude.$error.required || modifyDrivingRangeForm.latitude.$error.required">
+                    必填
+                  </code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">官方练习场</label>
+                <div class="col-sm-10">
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox" name="official" ng-model="updatedDrivingRange.official"> 官方自营练习场
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">优先级</label>
+                <div class="col-sm-10">
+                  <ui-select name="priority" ng-model="updatedDrivingRange.priority" ui-select-required>
+                    <ui-select-match>
+                      <span ng-bind="$select.selected"></span>
+                    </ui-select-match>
+                    <ui-select-choices repeat="priority in (priorities | filter: $select.search)">
+                      <span ng-bind="priority"></span>
+                    </ui-select-choices>
+                  </ui-select>
+                  <code ng-show="modifyDrivingRangeForm.priority.$error.uiSelectRequired">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">可预订开始时间</label>
+                <div class="col-sm-10">
+                  <div class="input-group bootstrap-timepicker timepicker">
+                    <div class="input-group-addon">
+                      <i class="fa fa-clock-o"></i>
+                    </div>
+                    <input type="text" autocomplete="off" class="form-control"
+                           id="updatedDrivingRangeTeeTimesStart" name="teeTimesStart"
+                           ng-model="updatedDrivingRange.teeTimesStart" required>
+                  </div>
+                  <code ng-show="modifyDrivingRangeForm.teeTimesStart.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">可预订结束时间</label>
+                <div class="col-sm-10">
+                  <div class="input-group bootstrap-timepicker timepicker">
+                    <div class="input-group-addon">
+                      <i class="fa fa-clock-o"></i>
+                    </div>
+                    <input type="text" autocomplete="off" class="form-control"
+                           id="updatedDrivingRangeTeeTimesEnd" name="teeTimesEnd"
+                           ng-model="updatedDrivingRange.teeTimesEnd" required>
+                  </div>
+                  <code ng-show="modifyDrivingRangeForm.teeTimesEnd.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">可提前预约开始天数</label>
+                <div class="col-sm-10">
+                  <input type="number" class="form-control" name="advanceReservationStart"
+                         ng-model="updatedDrivingRange.advanceReservationStart" required>
+                  <code ng-show="modifyDrivingRangeForm.advanceReservationStart.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">可提前预约结束天数</label>
+                <div class="col-sm-10">
+                  <input type="number" class="form-control" name="advanceReservationEnd"
+                         ng-model="updatedDrivingRange.advanceReservationEnd" required>
+                  <code ng-show="modifyDrivingRangeForm.advanceReservationEnd.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">价格</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-addon">￥</span>
+                    <input type="number" class="form-control" name="fees" ng-model="updatedDrivingRange.fees" required>
+                  </div>
+                  <code ng-show="modifyDrivingRangeForm.fees.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">返现</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-addon">￥</span>
+                    <input type="number" class="form-control" name="rebate" ng-model="updatedDrivingRange.rebate" required>
+                  </div>
+                  <code ng-show="modifyDrivingRangeForm.rebate.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">开启</label>
+                <div class="col-sm-10">
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox" name="enabled" ng-model="updatedDrivingRange.enabled">激活
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div><!-- /.box-body -->
+          <div class="box-footer">
+            <button class="btn btn-default" data-toggle="collapse" data-target="#modifyDrivingRangeRow">
+              取消
+            </button>
+            <button class="btn btn-warning pull-right" ng-click='modifyDrivingRange();'>修改</button>
+          </div><!-- /.box-footer -->
+        </div><!-- /.box -->
+        <!-- general form elements disabled -->
+      </div><!--/.col (right) -->
+    </div>   <!-- /.row -->
+
+    <div id="drivingRangeListRow" class="row">
+      <div class="col-xs-12">
+        <div class="box">
+          <div class="box-header">
+            <h3 class="box-title">练习场列表</h3>
+            <div class="box-tools pull-right">
+              <button class="btn btn-primary btn-sm" ng-click='showCreateDrivingRangeRow();'>添加练习场
+              </button>
+            </div>
+          </div><!-- /.box-header -->
+          <div class="box-body">
+            <table id="drivingRangeListTable" class="table table-bordered table-striped">
+              <thead>
+              <tr>
+                <th>ID</th>
+                <th>练习场名称</th>
+                <th>练习场类型</th>
+                <th>地址</th>
+                <th>操作</th>
+              </tr>
+              </thead>
+              <tfoot>
+              <tr>
+                <th>ID</th>
+                <th>练习场名称</th>
+                <th>练习场类型</th>
+                <th>地址</th>
+                <th>操作</th>
+              </tr>
+              </tfoot>
+            </table>
+          </div><!-- /.box-body -->
+        </div><!-- /.box -->
+      </div><!-- /.col -->
+    </div><!-- /.row -->
+
+    <div id="removeDrivingRangeModal" class="modal modal-danger fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">删除练习场</h4>
+          </div>
+          <div class="modal-body">
+            <p id="removeDrivingRangeModalContent"></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-outline" ng-click='removeDrivingRange();'>确认</button>
+          </div>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+
+  </section>
+  <!-- /.content -->
+</div>

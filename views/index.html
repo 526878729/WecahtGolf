@@ -1,0 +1,42 @@
+{% extends './layouts/layout_with_sidemenu.html' %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="/css/owl.carousel.css"/>
+<style type="text/css">
+  body{
+    background: #000;
+  }
+</style>
+{% endblock %}
+{% block content %}
+<div class="mainer">
+  <div class="banner_box banner_box2">
+    <a href="#"><img src="/img/banner_c001.jpg"/></a>
+    <a href="#"><img src="/img/banner_c002.jpg"/></a>
+    <a href="#"><img src="/img/banner_c001.jpg"/></a>
+  </div>
+  <div class="line_div1"><i></i></div>
+  <div class="ht30"></div>
+  <div class="ding_box">
+    <a href="/course" class="btn_ding btn_ding1">定球场</a>
+    <a href="/drivingrange" class="btn_ding btn_ding2">定练习场</a>
+  </div>
+  <div class="ht50"></div>
+  {% if preset.hotline %}
+  <div class="ding_p1">客服电话</div>
+  <div class="ding_p2"><a href="tel:{{ preset.hotline }}">{{ preset.hotline }}</a></div>
+  <div class="ht30"></div>
+  {% endif %}
+</div>
+{% endblock %}
+{% block footer %}
+<script src="/js/owl.carousel.min.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+  $(function(){
+    $('.banner_box').owlCarousel({
+      autoPlay : 3000,
+      singleItem : true
+    });
+  });
+</script>
+{% endblock %}

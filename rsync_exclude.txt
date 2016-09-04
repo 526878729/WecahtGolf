@@ -1,0 +1,25 @@
+#Logs
+.log
+npm-debug.log
+
+#Dependency Directory
+node_modules/
+
+#git
+.git/
+.gitignore
+
+#config
+config.js
+
+#IDE
+.idea
+.brackets.json
+
+#OS temp
+.DS_Store
+
+bin/www
+
+#Auto Generate Images
+public/master_files

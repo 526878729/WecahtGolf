@@ -1,0 +1,180 @@
+{% extends './layouts/layout_with_backbtn.html' %}
+
+{% block nav-center %}当前位置{% endblock %}
+{% block nav-right %}<div id="btn-show-map" class="head_r2"><img src="/img/icon_c014.png" width="20"/><i>地图</i></div>{% endblock %}
+{% block content %}
+<div class="mainer">
+  <div class="head_td_title">
+    <div class="head_td">
+      <a href="{{ searchUrl }}">
+        <i>默认排序</i>
+        <img src="/img/icon_c015.png" width="18px"/>
+      </a>
+    </div>
+    <div class="head_td">
+      <a href="{{ searchUrl }}&sort=fees">
+        <i>价格排序</i>
+        <img src="/img/icon_c016.png" width="24px"/>
+      </a>
+    </div>
+    <div class="head_td">
+      <a href="{{ searchUrl }}&sort=dis">
+        <i>距离排序</i>
+        <img src="/img/icon_c017.png" width="22px"/>
+      </a>
+    </div>
+  </div>
+  <div class="cd_list">
+    {% if courses.length == 0 %}
+    <div class="no_result">没有符合的球场</div>
+    {% endif %}
+    {% for course in courses %}
+    <div class="cd_li">
+      <a href="/course/{{ course._id.valueOf() }}?{{ searchQuery }}">
+      <div class="cd_td1"><img src="{{ course.thumbnail }}"/></div>
+      <div class="cd_td2">
+        <div class="cd_p1 text_overflow">{{ course.name}}</div>
+        <div class="cd_p2 text_overflow">{{ course.type }} {{ course.holes }}洞　{% if course.official %}<img src="/img/icon_c019.jpg" width="18" />{% endif %}</div>
+        <div class="cd_p3 text_overflow">{{ (course.distance / 1000).toFixed(2) }}KM {{ course.address }}</div>
+        <div class="cd_p4">
+          <div class="cd_p5">￥<i>{{ (course.fees / 100).toFixed(2) }}</i></div>
+          {% if false %}<div class="cd_p6">返<i>{{ (course.rebate /100).toFixed(0) }}</i></div>{% endif %}
+        </div>
+      </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div id="pb-gsg-map" class="pb-gsg-popup-container">
+  <div class="header">
+    <div class="head_c1 head_c2">
+      <div id="pb-gsg-back-map" class="head_l1"><img src="/img/icon_c011.png" width="15"/></div>
+      <div class="head_center1">球场选择</div>
+    </div>
+  </div>
+  <div class="ht50"></div>
+  <!--================= 头部结束 ====================-->
+  <!--================= 内容开始 ====================-->
+  <div id="course-map" class="map-container">
+
+  </div>
+</div>
+{% endblock %}
+{% block footer %}
+<script>
+  $("#btn-show-map").click(function(){
+    $("#pb-gsg-map").show();
+  });
+
+  $("#pb-gsg-back-map").click(function(){
+    $("#pb-gsg-map").hide();
+  });
+
+  var courses = {{ courses|json|safe }};
+  var geospatial = {{ geospatial|json|safe }};
+
+
+  function init() {
+    var overlays = [];
+
+    function CourseOverlay(course) {
+      this.course = course;
+      this.position = new qq.maps.LatLng(course.geospatial[1], course.geospatial[0]);
+    }
+
+    CourseOverlay.prototype = new qq.maps.Overlay();
+    //定义construct,实现这个接口来初始化自定义的Dom元素
+    CourseOverlay.prototype.construct = function() {
+      var div = this.div = document.createElement("div");
+
+      this.div.style.position = "absolute";
+
+      var overview = this.overview = document.createElement("div");
+      this.overview.className = "map-marker";
+      this.overview.innerHTML = this.course.nickname + " ¥" + (this.course.fees / 100).toFixed(0);
+
+      var detail = this.detail = document.createElement("div");
+      this.detail.className = "map-course-detail";
+      this.detail.innerHTML = "<a href='/course/" + this.course._id + "?{{ searchQuery }}'><h1>" + this.course.name + "</h1><p>" + this.course.address + "</p></a>";
+      this.div.appendChild(this.detail);
+      this.div.appendChild(this.overview);
+
+      //将dom添加到覆盖物层
+      var panes = this.getPanes();
+      //设置panes的层级，overlayMouseTarget可接收点击事件
+      panes.overlayMouseTarget.appendChild(div);
+
+      var self = this;
+      this.div.onclick = function() {
+        var display = self.detail.style.display;
+
+        for(var i = 0; i < overlays.length; i++){
+          overlays[i].closeDetail();
+        }
+
+        if(display === "none") {
+          self.detail.style.display = "block";
+        }
+
+        var detailWidth = self.detail.scrollWidth;
+        var detailHeight = self.detail.scrollHeight;
+
+        self.detail.style.top = -6 - detailHeight + "px";
+        self.detail.style.left = -(detailWidth - self.overview.scrollWidth) / 2 + "px";
+      }
+    };
+    CourseOverlay.prototype.closeDetail = function(){
+      this.detail.style.display = "none";
+    };
+    //实现draw接口来绘制和更新自定义的dom元素
+    CourseOverlay.prototype.draw = function() {
+      var overlayProjection = this.getProjection();
+      //返回覆盖物容器的相对像素坐标
+      var pixel = overlayProjection.fromLatLngToDivPixel(this.position);
+      var divStyle = this.div.style;
+      divStyle.left = pixel.x - this.overview.scrollWidth / 2 + "px";
+      divStyle.top = pixel.y - this.overview.scrollHeight / 2 + "px";
+    };
+    //实现destroy接口来删除自定义的Dom元素，此方法会在setMap(null)后被调用
+    CourseOverlay.prototype.destroy = function() {
+      this.div.onclick = null;
+      this.div.parentNode.removeChild(this.div);
+      this.div = null
+    };
+
+    var myLatlng = new qq.maps.LatLng(geospatial[1], geospatial[0]);
+
+    var myOptions = {
+      zoom: 10,
+      center: myLatlng,
+      mapTypeId: qq.maps.MapTypeId.ROADMAP,
+      zoomControl: false,
+      panControl: false
+    };
+
+    var map = new qq.maps.Map(document.getElementById("course-map"), myOptions);
+
+    var marker = new qq.maps.Marker({
+      position: myLatlng,
+      map: map
+    });
+
+    for(var i = 0; i < courses.length; i++){
+      var overlay = new CourseOverlay(courses[i]);
+      overlay.setMap(map);
+      overlays.push(overlay);
+    }
+  }
+
+  function loadScript() {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = "http://map.qq.com/api/js?v=2.exp&callback=init";
+    document.body.appendChild(script);
+  }
+
+  loadScript();
+</script>
+{% endblock %}

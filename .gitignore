@@ -1,0 +1,25 @@
+#Logs
+log
+*.log
+npm-debug.log*
+
+#Dependency Directory
+node_modules
+
+#IDE
+.idea
+.brackets.json
+
+#bootstrap
+bootstrap.*
+bootstrap-*
+npm.js
+
+#OS temp
+.DS_Store
+
+#Uploaded Photos
+public/photos
+
+#Auto Generate Images
+public/master_files

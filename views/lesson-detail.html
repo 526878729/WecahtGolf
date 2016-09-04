@@ -1,0 +1,403 @@
+{% extends './layouts/layout_with_sidemenu.html' %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="/css/mobiscroll.custom-2.5.0.min.css"/>
+<style type="text/css">
+  body{
+    background: #000;
+  }
+
+  .btn-routeplan {
+    font-size: 16px;
+    color: #fff;
+    padding: 6px 10px;
+    border: 1px solid;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div data-ng-app="lesson">
+  <input id="location" type="hidden" value="22.529288,114.058063">
+  <div id="pb-gsg-lesson-desc" class="mainer">
+    <div class="banner_box banner_box2">
+      <a href="#">
+        <!--<img src="{{ lesson.photos[0] }}"/>-->
+        <img src="../img/img_c029.jpg"/>
+      </a>
+      <div class="ding_box">
+        <button class="btn-routeplan">导航到上课地点</button>
+      </div>
+      <div class="ht20"></div>
+    </div>
+    <div class="ht30"></div>
+    <div class="fixed fixed-bottom lesson-controller">
+      <div class="ding_box">
+        <a href="tel:{{ preset.hotline }}" class="btn_ding btn_ding2 btn_1by4">客服热线</a>
+        <button id="btn-lesson" class="btn_ding btn_ding1 btn_3by4">购买课程 ¥{{ (lesson.fees / 100).toFixed(0) }}</button>
+      </div>
+      {% if promotion %}
+      <div class="ht20"></div>
+      <div class="ding_box">
+        <button id="btn-promotion" class="btn_ding btn_ding2">{{ promotion.title }}</button>
+      </div>
+      {% endif %}
+    </div>
+    <div class="ht30"></div>
+  </div>
+  <div id="pb-gsg-lesson" class="pb-gsg-popup-container" data-ng-controller="lessonController">
+    <div class="header">
+      <div class="head_c1 head_c2">
+        <div id="pb-gsg-back-booking" class="head_l1"><img src="/img/icon_c011.png" width="15"/></div>
+        <div class="head_center1">购买课程</div>
+        <div class="head_r1"><a href="tel:{{ preset.hotline }}"><img src="/img/icon_c021.png" width="28"/></a></div>
+      </div>
+    </div>
+    <div class="ht50"></div>
+    <!--================= 头部结束 ====================-->
+    <!--================= 内容开始 ====================-->
+    <div class="mainer">
+      <form name="lesson" method="post" action="/order/lesson" novalidate>
+        <input type="hidden" name="lessonId" value="{{ lesson.id }}">
+        <input type="hidden" name="numberOfPeople" value="1"/>
+        <div class="txdd_page">
+          <div class="ht10"></div>
+          <div class="txdd_p1 txdd_p">
+            <i class="txdd_i1">{{ lesson.title }}</i>
+          </div>
+          <div class="txdd_p1 txdd_p">
+            <i class="txdd_i2">预约日期</i>
+            <i class="txdd_i3">
+              <input class="st_date cdjs_input3" name="selectDate" type="text" readonly="readonly" data-ng-model="selectDate" placeholder="日期" required>
+            </i>
+          </div>
+          <div class="txdd_p2 txdd_p">
+            <i class="txdd_i2">预约时间</i>
+            <i class="txdd_i3">
+              <input class="st_time cdjs_input3" name="selectTime" type="text" readonly="readonly" data-ng-model="selectTime" placeholder="时间" required>
+            </i>
+          </div>
+          {% if false %}
+          <div class="txdd_p2 txdd_p">
+            <i class="txdd_i2">人数</i>
+            <i class="txdd_i3">
+              <button type="button" class="txdd_jian" data-ng-click="decreasePeople()">-</button>
+              <input class="txdd_ji" type="text" name="numberOfPeople" data-ng-model="numberOfPeople"/>
+              <button type="button" class="txdd_jia" data-ng-click="increasePeople()">+</button>
+              &nbsp;人
+            </i>
+          </div>
+          {% endif %}
+          <div class="txdd_p3 txdd_p">
+            <i class="txdd_i2">姓名</i>
+            <i class="txdd_i3">
+              <input class="cdjs_input3" type="text" name="name" data-ng-model="name" placeholder="请填写姓名" required>
+            </i>
+          </div>
+          <div class="txdd_p4 txdd_p">
+            <i class="txdd_i2">联系人手机</i>
+            <i class="txdd_i3">
+              <input class="cdjs_input3" type="number" name="phoneNumber" data-ng-model="mobile" placeholder="请填写手机" minlength="11" maxlength="11" data-ng-pattern="/(^(13\d|14[57]|15[^4,\D]|17[678]|18\d)\d{8}|170[059]\d{7})$/" required>
+            </i>
+          </div>
+          <div class="txdd_p5 txdd_p">
+            <textarea name="message" class="qt_liuyan" rows="" cols="" placeholder="其他留言"></textarea>
+          </div>
+          <div class="txdd_p5 txdd_p" data-ng-show="numberOfPeople > 1">
+            <i class="txdd_i2">付款类型</i>
+            <i class="txdd_i3">
+              <label><input type="radio" name="payType" data-ng-model="payType" value="0"> 我付全款</label>
+              <label><input type="radio" name="payType" data-ng-model="payType" value="1"> AA付款</label>
+            </i>
+          </div>
+          <div class="txdd_p6">
+            <i class="txdd_i6">总计<i class="txdd_i7" data-ng-cloak>￥{% raw %}{{ getTotal() }}{% endraw %}</i></i>
+          </div>
+          <div class="ht10"></div>
+          <div class="alert alert-danger" data-ng-show="lesson.$invalid && submitted" data-ng-cloak>
+            <ul class="list-layout">
+              <li data-ng-show="lesson.selectDate.$error.required">请选择日期</li>
+              <li data-ng-show="lesson.name.$error.required">请输入姓名</li>
+              <li data-ng-show="lesson.phoneNumber.$error.required">请输入手机</li>
+              <li data-ng-show="lesson.phoneNumber.$error.pattern">请输入正确的手机</li>
+            </ul>
+          </div>
+          <div class="txdd_p7">
+            <button type="button" class="qd_yd" data-ng-click="validate()">确认并购买</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  {% if promotion %}
+  <div id="pb-gsg-promotion" class="pb-gsg-popup-container" data-ng-controller="promotionController">
+    <div class="header">
+      <div class="head_c1 head_c2">
+        <div id="pb-gsg-back-promotion" class="head_l1"><img src="/img/icon_c011.png" width="15"/></div>
+        <div class="head_center1">购买课程</div>
+        <div class="head_r1"><a href="tel:{{ preset.hotline }}"><img src="/img/icon_c021.png" width="28"/></a></div>
+      </div>
+    </div>
+    <div class="ht50"></div>
+    <!--================= 头部结束 ====================-->
+    <!--================= 内容开始 ====================-->
+    <div class="mainer">
+      <form name="promotion" method="post" action="/order/lesson" novalidate>
+        <input type="hidden" name="lessonId" value="{{ lesson.id }}">
+        <input type="hidden" name="promotionId" value="{{ promotion.id }}">
+        <input type="hidden" name="numberOfPeople" value="1">
+        <input type="hidden" name="payType" value="0">
+        <div class="txdd_page">
+          <div class="ht10"></div>
+          <div class="txdd_p1 txdd_p">
+            <i class="txdd_i1">{{ lesson.title }}({{ promotion.title }})</i>
+          </div>
+          <div class="txdd_p1 txdd_p">
+            <i class="txdd_i2">日期</i>
+            <i class="txdd_i3">
+              <input class="cdjs_input3" type="text" name="selectDate" data-ng-model="selectDate" readonly>
+            </i>
+          </div>
+          <div class="txdd_p3 txdd_p">
+            <i class="txdd_i2">姓名</i>
+            <i class="txdd_i3">
+              <input class="cdjs_input3" type="text" name="name" data-ng-model="name" placeholder="请填写姓名" required>
+            </i>
+          </div>
+          <div class="txdd_p4 txdd_p">
+            <i class="txdd_i2">联系人手机</i>
+            <i class="txdd_i3">
+              <input class="cdjs_input3" type="number" name="phoneNumber" data-ng-model="mobile" placeholder="请填写手机" minlength="11" maxlength="11" data-ng-pattern="/(^(13\d|14[57]|15[^4,\D]|17[678]|18\d)\d{8}|170[059]\d{7})$/" required>
+            </i>
+          </div>
+          <div class="txdd_p5 txdd_p">
+            <textarea name="message" class="qt_liuyan" rows="" cols="" placeholder="其他留言"></textarea>
+          </div>
+          <div class="txdd_p6">
+            <i class="txdd_i6">总计<i class="txdd_i7">￥{{ (lesson.fees / 100).toFixed(2) }}</i></i>
+          </div>
+          <div class="ht10"></div>
+          <div class="alert alert-danger" data-ng-show="promotion.$invalid && submitted" data-ng-cloak>
+            <ul class="list-layout">
+              <li data-ng-show="promotion.name.$error.required">请输入姓名</li>
+              <li data-ng-show="promotion.phoneNumber.$error.required">请输入手机</li>
+              <li data-ng-show="promotion.phoneNumber.$error.pattern">请输入正确的手机</li>
+            </ul>
+          </div>
+          <div class="txdd_p7">
+            <button type="button" class="qd_yd" data-ng-click="validate()">确认并购买</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+  <div id="pb-gsg-routeplan" class="pb-gsg-popup-container">
+    <div class="header">
+      <div class="head_c1 head_c2">
+        <div id="pb-gsg-back-routeplan" class="head_l1"><img src="/img/icon_c011.png" width="15"/></div>
+        <div class="head_center1">导航</div>
+      </div>
+    </div>
+    <div class="ht50"></div>
+    <div class="map-container pb-gsg-iframe-container">
+      <iframe id="pb-gsg-iframe-roadplan"></iframe>
+    </div>
+  </div>
+</div>
+{% endblock %}}
+
+{% block footer %}
+<script src="/js/mobiscroll.custom-2.5.0.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="http://cdn.bootcss.com/moment.js/2.10.6/moment.min.js"></script>
+<script src="/js/angular-1.4.8-min.js"></script>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script type="text/javascript">
+  $(function(){
+//日历控件
+    $(".st_date").mobiscroll().date();
+    $('.st_time').mobiscroll().date();
+    var now = new Date();
+//初始化日期控件
+    var opt1 = {
+      preset: 'date', //日期，可选：date\datetime\time\tree_list\image_text\select
+      theme: 'android', //皮肤样式，可选：default\android\android-ics light\android-ics\ios\jqm\sense-ui\wp light\wp
+      display: 'bottom', //显示方式 ，可选：modal\inline\bubble\top\bottom
+      mode: 'scroller', //日期选择模式，可选：scroller\clickpick\mixed
+      lang:'zh',
+      dateFormat: 'yyyy-mm-dd', // 日期格式
+      setText: '确定', //确认按钮名称
+      cancelText: '取消',//取消按钮名籍我
+      dateOrder: 'yyyymmdd', //面板中日期排列格式
+      dayText: '日', monthText: '月', yearText: '年',hourText:'时', //面板中年月日文字
+      showNow: false,
+      nowText: "今",
+      startYear: now.getFullYear(), //开始年份
+      endYear: now.getFullYear() + 100, //结束年份
+      minDate: now
+    };
+
+    var opt2 = {
+      preset: 'time', //日期，可选：date\datetime\time\tree_list\image_text\select
+      theme: 'android', //皮肤样式，可选：default\android\android-ics light\android-ics\ios\jqm\sense-ui\wp light\wp
+      display: 'bottom', //显示方式 ，可选：modal\inline\bubble\top\bottom
+      mode: 'scroller', //日期选择模式，可选：scroller\clickpick\mixed
+      lang:'zh',
+      dateFormat: 'yyyy-mm-dd', // 日期格式
+      setText: '确定', //确认按钮名称
+      cancelText: '取消',//取消按钮名籍我
+      dateOrder: 'yyyymmdd', //面板中日期排列格式
+      dayText: '日', monthText: '月', yearText: '年',hourText:'时', //面板中年月日文字
+      showNow: false,
+      nowText: '今',
+      startYear: now.getFullYear(), //开始年份
+      endYear: now.getFullYear() + 100 //结束年份
+//      minDate: now
+    };
+
+    $(".st_date").mobiscroll(opt1);
+    $(".st_time").mobiscroll(opt2);
+  });
+
+  $('#btn-lesson').click(function(){
+    $("#pb-gsg-lesson").show();
+    $("#pb-gsg-lesson-desc").hide();
+  });
+
+  $('#pb-gsg-back-booking').click(function(){
+    $('#pb-gsg-lesson').hide();
+    $("#pb-gsg-lesson-desc").show();
+  });
+
+  $('#btn-promotion').click(function(){
+    $("#pb-gsg-promotion").show();
+    $("#pb-gsg-lesson-desc").hide();
+  });
+
+  $('#pb-gsg-back-promotion').click(function(){
+    $('#pb-gsg-promotion').hide();
+    $("#pb-gsg-lesson-desc").show();
+  });
+  var fees = {{ lesson.fees|safe }};
+  var app = angular.module('lesson', []);
+
+  app.controller('lessonController', function($scope, $http){
+    $scope.submitted = false;
+    $scope.selectDate = moment().add(1, 'day').format("YYYY-MM-DD");
+    $scope.selectTime = "09:30 AM";
+    $scope.numberOfPeople = 1;
+    $scope.fees = fees;
+    $scope.payType = 0;
+
+    $scope.validate = function(){
+      if(!$scope.lesson.$valid){
+        $scope.submitted = true;
+      }else{
+        document.forms[0].submit();
+      }
+    };
+    
+    $scope.increasePeople = function(){
+      $scope.numberOfPeople++;
+    };
+
+    $scope.decreasePeople = function() {
+      if ($scope.numberOfPeople !== 1) {
+        $scope.numberOfPeople--;
+      }
+    };
+    
+    $scope.getTotal = function(){
+      return ($scope.fees *  $scope.numberOfPeople/ 100).toFixed(2);
+    };
+
+    $http.get("/lesson-order/lastcontact").success(function(contact){
+      $scope.name = contact.name;
+      $scope.mobile = parseInt(contact.phoneNumber);
+    });
+  });
+
+  {% if promotion %}
+  var selectDate = "{{ promotion.activityDate.toString() }}";
+  selectDate = new Date(selectDate);
+
+  app.controller('promotionController', function($scope, $http){
+    $scope.submitted = false;
+    $scope.selectDate = selectDate.getFullYear() + "-" + (selectDate.getMonth() + 1) + "-" + selectDate.getDate();
+
+    $scope.validate = function(){
+      if(!$scope.promotion.$valid){
+        $scope.submitted = true;
+      }else{
+        document.forms[1].submit();
+      }
+    };
+
+    $http.get("/lesson-order/lastcontact").success(function(contact){
+      $scope.name = contact.name;
+      $scope.mobile = parseInt(contact.phoneNumber);
+    });
+  });
+  {% endif %}
+
+  {% if wechatConfig %}
+  var config = {{ wechatConfig|json|safe }};
+  var shareMessage = {{ shareMessage|json|safe }};
+
+  wx.config({
+    debug: false,
+    appId: config.appId,
+    timestamp: config.timestamp,
+    nonceStr: config.nonceStr,
+    signature: config.signature,
+    jsApiList: ['getLocation', 'onMenuShareTimeline', 'onMenuShareAppMessage']
+  });
+
+  wx.ready(function() {
+    wx.getLocation({
+      type: 'wgs84',
+      success: function (res) {
+        var latitude = parseFloat(res.latitude);
+        var longitude = parseFloat(res.longitude);
+        $("#location").val(latitude + ',' + longitude);
+      }
+    });
+
+    wx.onMenuShareTimeline({
+      title: shareMessage.title,
+      link: shareMessage.link,
+      imgUrl: shareMessage.imgUrl,
+      success: function () {
+      },
+      cancel: function () {
+      }
+    });
+
+    wx.onMenuShareAppMessage({
+      title: shareMessage.title,
+      desc: shareMessage.desc,
+      link: shareMessage.link,
+      imgUrl: shareMessage.imgUrl,
+      success: function () {
+      },
+      cancel: function () {
+      }
+    });
+  });
+  {% endif %}
+  var lesson = {{ lesson|json|safe }};
+  var roadPlanLoaded = false;
+
+  $(".btn-routeplan").click(function(){
+    $("#pb-gsg-routeplan").show();
+    if(!roadPlanLoaded) {
+      $("#pb-gsg-iframe-roadplan").attr("src", "http://apis.map.qq.com/uri/v1/routeplan?type=drive&from=我的位置&fromcoord=" + $("#location").val() + "&to=" + lesson.address + "&tocoord=" + lesson.geospatial[1] + "," + lesson.geospatial[0] + "&policy=0&referer=myapp");
+      roadPlanLoaded = true;
+    }
+  });
+
+  $("#pb-gsg-back-routeplan").click(function(){
+    $("#pb-gsg-routeplan").hide();
+  });
+</script>
+{% endblock %}

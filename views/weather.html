@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>高手高尔夫</title>
+    <script src="http://apps.bdimg.com/libs/angular.js/1.4.6/angular.min.js"></script>
+    <!--<link rel="stylesheet" type="text/css" href="/css/style.css?_201602181">-->
+    <link rel="stylesheet" type="text/css" href="../css/style.css">
+</head>
+<body>
+
+<div ng-app="myApp" ng-controller="myCtrl">
+    <div data-ng-show="wait">正在读取数据，请稍等...</div>
+    <div class="weather-list" >
+        <div class="weather-cell" ng-repeat="weatherinfo in weatherlist">
+            <i class="weather-cell-date">[[ weatherinfo.date ]]</i>
+            <i class="weather-cell-l-tmp">[[ weatherinfo.lowtemp ]]</i>
+            <i class="weather-cell-h-tmp">/[[ weatherinfo.hightemp ]]</i>
+            <img class="weather-cell-state-img" ng-src="[[ weatherinfo.img ]]"/>
+
+            <div>
+                <div class="weather-cell-state-div">
+                    <i class="weather-cell-state">[[ weatherinfo.type ]]</i>
+                    <i class="weather-cell-wind">[[ weatherinfo.fengli ]]</i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var city = '{{city}}';
+    var app = angular.module('myApp', []).config(['$interpolateProvider',
+        function($interpolateProvider) {
+            // Swig uses {{}} for variables which makes it clash with the use of {{}} in AngularJS.
+            // Replaced use of {{}} with [[]] in AngularJS to make it work with Swig.
+            $interpolateProvider.startSymbol('[[');
+            $interpolateProvider.endSymbol(']]');
+        }
+    ]);;
+    app.controller('myCtrl', function ($scope, $http) {
+        $scope.wait = true;
+        $scope.weatherlist = [];
+            $http.get("http://apis.baidu.com/apistore/weatherservice/recentweathers?cityname=" + city, {
+                headers: {
+                    apikey: '5f5aa313b0efc0daa17027e25a4abda4'
+                }
+            }).then(function (response) {
+                $scope.weatherlist.push(response.data.retData.today);
+                for (var i = 0; i < response.data.retData.forecast.length; i++) {
+                    $scope.weatherlist.push(response.data.retData.forecast[i]);
+                }
+                for (var i = 0; i < $scope.weatherlist.length; i++) {
+                    if ($scope.weatherlist[i].type == "晴") {
+                        $scope.weatherlist[i].img = "../img/img_weather_state_2.png";
+                    }else{
+                        $scope.weatherlist[i].img = "../img/img_weather_state_1.png";
+                    }
+                }
+            });
+        $scope.wait = false;
+//        }
+    });
+</script>
+</body>
+</html>

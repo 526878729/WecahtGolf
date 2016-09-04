@@ -1,0 +1,48 @@
+{% extends './layouts/layout_with_sidemenu.html' %}
+
+{% block nav-center %}提交结果{% endblock %}
+
+{% block content %}
+<div class="mainer">
+  <div class="ht30"></div>
+  {% if result %}
+  <div class="tjcg_p1"><img src="/img/icon_c023.png"/></div>
+  <div class="ht30"></div>
+  <div class="tjcg_p2">
+    订单提交成功！
+  </div>
+  <div class="tjcg_p2">
+    GOLF会在30分钟内与球场确认订单并给您反馈。请您耐心等待。
+  </div>
+  <div class="ht15"></div>
+  <div class="tjcg_p2">
+    您也可以进入<a href="">我的订单</a>随时查看进度
+  </div>
+  <div class="ht15"></div>
+  <div class="tjcg_p3">
+    <a href="/order" class="btn_mor">我的订单</a>
+  </div>
+  {% else %}
+  <div class="tjcg_p1"><img src="/img/icon_c024.png"/></div>
+  <div class="ht30"></div>
+  <div class="tjsb_p1">
+    提交失败
+  </div>
+  <div class="ht15"></div>
+  <div class="tjsb_p2">
+    {{ error }}
+    <!--抱歉！您的网络不好请您重新提交。-->
+  </div>
+  <div class="ht15"></div>
+  <div class="ht15"></div>
+  <div class="tjcg_p3">
+    <button type="button" class="back-btn btn_mor">返回重新提交</button>
+  </div>
+  {% endif %}
+  {% if preset.hotline %}
+  <div class="ht50"></div>
+  <div class="tjcg_p4">客服电话：<a href="tel:{{ preset.hotline }}">{{ preset.hotline }}</a></div>
+  {% endif %}
+  <div class="ht50"></div>
+</div>
+{% endblock %}

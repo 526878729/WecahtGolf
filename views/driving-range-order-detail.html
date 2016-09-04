@@ -1,0 +1,478 @@
+{% extends './layouts/layout_with_backbtn.html' %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="/css/mobiscroll.custom-2.5.0.min.css"/>
+<link rel="stylesheet" href="/css/alertify.core.css"/>
+<link rel="stylesheet" href="/css/alertify.default.css" id="toggleCSS"/>
+{% endblock %}
+
+{% block nav-center %}订单详情{% endblock %}
+{% block nav-right %}{% endblock %}
+
+{% block content %}
+<div data-ng-app="orderDetail" data-ng-controller="orderDetailController">
+  <div id="pb-gsg-booking" class="">
+    <div class="header">
+      <div class="head_c1 head_c2">
+        <div id="pb-gsg-back-booking" class="head_l1"><img src="/img/icon_c011.png" width="15"/></div>
+        <div class="head_center1">订单详情</div>
+        <div class="head_r1"><a href="tel:{{ preset.hotline }}"><img src="/img/icon_c021.png"
+                                                                                    width="28"/></a></div>
+      </div>
+    </div>
+    <!--================= 头部结束 ====================-->
+    <!--================= 内容开始 ====================-->
+    <div class="mainer" ng-cloak>
+      <form name="booking" method="post" action="" novalidate>
+        <input type="hidden" name="orderId" value="{{ orderDetail.orderId.valueOf() }}">
+        <input type="text" name="total" data-ng-model="total" class="collapse">
+
+        <div class="txdd_page">
+          <div class="ht10"></div>
+          <div class="txdd_p1 txdd_p">
+            <i class="txdd_i1">{{ orderDetail.drivingRangeName }}</i>
+            <i class="txdd_i1">{{orderDetail.bookingDate}}</i>
+          </div>
+          <div class="txdd_p2 txdd_p">
+            <i class="txdd_i2">打球人数</i>
+            <i class="txdd_i3">
+              <button type="button" class="txdd_jian" ng-show='decBtn.show' data-ng-click="decreasePeople()">-</button>
+              <input class="txdd_ji" type="text" name="numberOfPeople" ng-readonly="inputReadOnly" data-ng-model="numberOfPeople"/>人
+              <button type="button" class="txdd_jia" ng-show='incBtn.show' data-ng-click="increasePeople()">+</button>
+            </i>
+          </div>
+          <div class="txdd_p3 txdd_p">
+            <i class="txdd_i2">打球人姓名</i>
+            <i class="txdd_i3">
+              <input class="cdjs_input3" type="text" name="name" ng-readonly="inputReadOnly" data-ng-model="name" placeholder="请填写姓名" required>
+            </i>
+          </div>
+          <div class="txdd_p4 txdd_p">
+            <i class="txdd_i2">联系人手机</i>
+            <i class="txdd_i3">
+              <input class="cdjs_input3" type="number" name="phoneNumber" ng-readonly="inputReadOnly" data-ng-model="phoneNumber"
+                     placeholder="请填写手机" minlength="11" maxlength="11"
+                     data-ng-pattern="/(^(13\d|14[57]|15[^4,\D]|17[678]|18\d)\d{8}|170[059]\d{7})$/" required>
+            </i>
+          </div>
+          {% if isShow == true %}
+          <div class="txdd_p5 txdd_p" ng-show='payMethodDiv.show'>
+            <i class="txdd_i2">付款类型</i>
+            <i class="txdd_i3">
+              <i name="paySelectedType" data-ng-bind="paySelectedType"></i>
+            </i>
+          </div>
+          <div class="txdd_p5 txdd_p" data-ng-show="numberOfPeople > 0 && payMethodCheckBox.show">
+            <i class="txdd_i2">付款类型</i>
+            <i class="txdd_i3">
+              <label><input type="radio" name="payType" data-ng-model="payType" data-ng-click="changePayType(0)" value="0"> 我付全款</label>
+              <label><input type="radio" name="payType" data-ng-model="payType" ng-disabled ="aaPayTypeDisabled" data-ng-click="changePayType(1)" value="1"> AA付款</label>
+            </i>
+          </div>
+          {% endif %}
+          <div class="txdd_p5 txdd_p">
+            <textarea name="message" class="qt_liuyan" rows="" cols="" ng-disabled ="textDisabled" data-ng-model="message"></textarea>
+          </div>
+          <div class="od_state">
+            <div>
+              <i ng-class="{true:'od_state_txt_h' , false: 'od_state_txt_n'}[state1]">选择打球&nbsp;&nbsp;</i>
+              <i id="confirm_state_0" ng-class="{true:'od_state_txt_h' , false: 'od_state_txt_n'}[state2]"></i>
+              <i id="pay_state_0" ng-class="{true:'od_state_txt_h' , false: 'od_state_txt_n'}[state3]"></i>
+              <i ng-class="{true:'od_state_txt_h' , false: 'od_state_txt_n'}[state4]">订场&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</i>
+            </div>
+            <div>
+              <i ng-class="{true:'od_state_txt_h' , false: 'od_state_txt_n'}[state1]">地点与时间</i>
+              <i id="confirm_state_1" ng-class="{true:'od_state_txt_h' , false: 'od_state_txt_n'}[state2]"></i>
+              <i id="pay_state_1" ng-class="{true:'od_state_txt_h' , false: 'od_state_txt_n'}[state3]"></i>
+              <i ng-class="{true:'od_state_txt_h' , false: 'od_state_txt_n'}[state4]">成功&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</i>
+            </div>
+            <div class="od_state_progress">
+              <img class="od_state_img" data-ng-src="{% raw %}{{ progressImg }}{% endraw %}"/>
+            </div>
+          </div>
+          <div class="od_total_price">
+            <i>
+              总价:￥
+              <i class="od_tp_1">{% raw %}{{ getCourseFee() }}{% endraw %}</i>
+              <i>/人 x </i>
+              <i class="od_tp_1">{% raw %}{{ getNumberOfPeople() }}{% endraw %}</i>
+              <i>人 =￥</i>
+              <i class="od_tp_1">{% raw %}{{ getTotal() }}{% endraw %}</i>
+            </i>
+          </div>
+          <div class="od_total_price">
+            <i>
+              您应付:￥
+              <i class="od_tp_1">{% raw %}{{ getMushPay() }}{% endraw %}</i>
+            </i>
+          </div>
+          <div class="ht10"></div>
+          <div class="alert alert-danger" data-ng-show="booking.$invalid && submitted" data-ng-cloak>
+            <ul class="list-layout">
+              <li data-ng-show="booking.name.$error.required">请输入姓名</li>
+              <li data-ng-show="booking.phoneNumber.$error.required">请输入手机</li>
+              <li data-ng-show="booking.phoneNumber.$error.pattern">请输入正确的手机</li>
+            </ul>
+          </div>
+          <div class="txdd_p7">
+            <button type="button" class="od_bt_edit" ng-show='updateBtn.show' data-ng-click="update()">保存修改</button>
+          </div>
+          <div class="txdd_p7">
+            <button type="button" class="od_bt_update" ng-show='editBtn.show' data-ng-click="edit()">修改订单</button>
+          </div>
+          <div class="txdd_p7">
+            {% if wpParams %}
+            <button id="btn-wppay" type="button" class="btn-wechat-pay">微信支付</button>
+            {% else %}
+            <button type="button" class="btn-wechat-pay" ng-show='payBtn.show' data-ng-click="pay()">测试支付</button>
+            {% endif %}
+          </div>
+          <div class="txdd_p7">
+            <button type="button" class="od_bt_update" ng-show='inviteBtn.show' data-ng-click="invite()">邀请好友</button>
+          </div>
+          <div class="txdd_p7">
+            <button type="button" class="qd_yd" ng-show='cancelBtn.show' data-ng-click="cancel()">取消订单</button>
+          </div>
+          <div class="od_ref">
+            <i class="od_ref_1">您的订单号是</i>
+            <i class="od_ref_2">{{ orderDetail.refId }}</i>
+          </div>
+          <br>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+{% if wpParams %}
+<script>
+
+  function onBridgeReady(){
+    WeixinJSBridge.invoke('getBrandWCPayRequest', {{ wpParams|json|safe }}, function(res){
+      if(res.err_msg == "get_brand_wcpay_request:ok") {
+        self.location.reload(true);
+      }
+    });
+  }
+
+  $("#btn-wppay").click(function(){
+    if (typeof WeixinJSBridge == "undefined"){
+      if( document.addEventListener ){
+        document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+      }else if (document.attachEvent){
+        document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+        document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+      }
+    }else{
+      onBridgeReady();
+    }
+  });
+</script>
+{% endif %}
+<script src="/js/mobiscroll.custom-2.5.0.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="/js/angular-1.4.8-min.js"></script>
+<script src="/js/alertify.min.js"></script>
+<script type="text/javascript">
+
+  function reset() {
+    $("#toggleCSS").attr("href", "/css/alertify.default.css");
+    alertify.set({
+      labels: {
+        ok: "确定",
+        cancel: "取消"
+      },
+      delay: 5000,
+      buttonReverse: false,
+      buttonFocus: "确定"
+    });
+  }
+
+  $('#pb-gsg-back-booking').click(function () {
+    self.location.href = "/order";
+  });
+
+
+  var fees = {{orderDetail.fees | safe}};
+  var numberOfPeople = {{orderDetail.numberOfPeople}};
+  var phoneNumber = {{orderDetail.phoneNumber}};
+  var name = "{{ orderDetail.ownerName }}";
+  var message = "{{orderDetail.message}}";
+  var drivingRangeOrderState = {{orderDetail.drivingRangeOrderState}};
+  var orderId = "{{ orderDetail.orderId.valueOf() }}";
+  var payType = {{orderDetail.payType}};
+  var isOwner = {{isOwner}};
+
+  var app = angular.module('orderDetail', []);
+
+  app.controller('orderDetailController', function ($scope, $http) {
+    $scope.total = fees * numberOfPeople;
+    $scope.numberOfPeople = numberOfPeople;
+    $scope.name = name;
+    $scope.phoneNumber = phoneNumber;
+    $scope.message = message;
+    $scope.fees = fees / 100;
+    $scope.submitted = false;
+
+    $scope.stateImg = true;
+
+    $scope.paySelectedType = payType == 0 ? "我付全款" : "AA付款";
+    $scope.payType = payType;
+
+    $scope.decBtn = {show: false};
+    $scope.incBtn = {show: false};
+
+    $scope.payMethodDiv = {show: false};
+    $scope.payMethodCheckBox = {show: false};
+
+    $scope.updateBtn = {show: false};
+    $scope.editBtn = {show: false};
+
+    $scope.inviteBtn = {show: false};
+    $scope.payBtn = {show: false};
+    $scope.cancelBtn = {show: false};
+
+    $scope.inputReadOnly = true;
+    $scope.textDisabled = true;
+    $scope.aaPayTypeDisabled = payType == 0 ;
+
+    updateState (drivingRangeOrderState);
+
+    $scope.increasePeople = function () {
+      $scope.numberOfPeople++;
+      $scope.total = fees * $scope.numberOfPeople;
+      $scope.aaPayTypeDisabled = $scope.numberOfPeople > 1 ? false : true;
+      $scope.getMushPay();
+    };
+
+    $scope.decreasePeople = function () {
+      if ($scope.numberOfPeople !== 1) {
+        $scope.numberOfPeople--;
+      }
+
+      $scope.total = fees * $scope.numberOfPeople;
+      $scope.aaPayTypeDisabled = $scope.numberOfPeople > 1 ? false : true;
+      $scope.changePayType ($scope.numberOfPeople == 1 ? 0 : $scope.payType);
+      $scope.getMushPay();
+    };
+
+    $scope.getMushPay = function () {
+      var paidTotal = 0;
+
+      if ($scope.payType == 0) {
+        paidTotal = ($scope.total / 100 ).toFixed(2);
+      } else {
+        paidTotal = ($scope.total / 100 / $scope.numberOfPeople).toFixed(2);
+      }
+
+      return paidTotal;
+    };
+
+
+    $scope.getTotal = function () {
+      return ($scope.total / 100).toFixed(2);
+    };
+
+    $scope.getCourseFee = function () {
+      return $scope.fees;
+    };
+
+    $scope.getNumberOfPeople = function () {
+      return $scope.numberOfPeople;
+    };
+
+    $scope.changePayType = function (type) {
+      $scope.payType = type;
+      $scope.getMushPay();
+      return;
+    };
+
+    $scope.edit = function () {
+      updateEditMode (0);
+    }
+
+    $scope.cancel = function () {
+      if (!$scope.booking.$valid) {
+        $scope.submitted = true;
+      } else {
+        reset();
+        alertify.confirm("确定取消订单?", function (e) {
+          if (e) {
+            var formData = {
+              orderId: "{{ orderDetail.orderId.valueOf() }}"
+            };
+
+            var url = "/order/drivingrange/cancel";
+
+            postForm(formData, url, function (data) {
+              reset();
+              if (data.msg == "success") {
+                self.location.href = "/order";
+              } else {
+                alertify.alert(data.msg);
+              }
+            });
+          } else {
+
+          }
+        });
+      }
+    };
+
+    // process the form
+    $scope.update = function () {
+      var formData = {
+        orderId: "{{ orderDetail.orderId.valueOf() }}",
+        numberOfPeople: $scope.numberOfPeople,
+        name: $scope.name,
+        phoneNumber: $scope.phoneNumber,
+        message: $scope.message,
+        payType: $scope.payType
+      };
+
+      var url = "/order/drivingrange/update";
+
+      postForm(formData, url, function (data) {
+        reset();
+        if (data.msg == "success") {
+          alertify.alert("更新成功");
+          payType = $scope.payType;
+          updateState(0);
+          updateEditMode (1);
+        } else {
+          alertify.alert(data.msg);
+        }
+      });
+    };
+
+    $scope.pay = function () {
+      if (checkChange()) {
+        alertify.alert("信息更新了,需要先保存更新");
+      } else {
+        var formData = {
+          orderId: "{{ orderDetail.orderId.valueOf() }}"
+        };
+
+        var url = "/order/pay";
+
+        postForm(formData, url, function (data) {
+          reset();
+          if (data.msg == "complete") {
+            alertify.alert("支付完成");
+            self.location.reload(true);
+          } else if (data.msg == "paid") {
+            alertify.alert("支付完成,开团啦");
+            self.location.reload(true);
+          } else {
+            alertify.alert("支付出错了");
+          }
+        });
+      }
+    };
+
+    $scope.invite = function () {
+
+    };
+
+    function updateEditMode (mode) {
+      var isEdit = mode == 0 ? true : false;
+
+      $scope.updateBtn.show = isEdit;
+      $scope.editBtn.show = !isEdit;
+      $scope.inputReadOnly = !isEdit;
+      $scope.textDisabled = !isEdit;
+      $scope.decBtn.show = isEdit;
+      $scope.incBtn.show = isEdit;
+    }
+
+    function checkChange() {
+      var hasChanged = false;
+
+      if(numberOfPeople != $scope.numberOfPeople) {
+        hasChanged = true;
+      } else if (name != $scope.name) {
+        hasChanged = true;
+      } else if (phoneNumber != $scope.phoneNumber) {
+        hasChanged = true;
+      } else if (payType != $scope.payType) {
+        hasChanged = true;
+      } else if (message != $scope.message) {
+        hasChanged = true;
+      }
+
+      return hasChanged;
+    };
+
+    function postForm(data, url, callback) {
+      $http({
+        method: 'PUT',
+        url: url,
+        data: $.param(data),  // pass in data as strings
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
+      }).success(function (data) {
+        callback(data);
+      });
+    };
+
+    function updateState (newState) {
+      drivingRangeOrderState = newState;
+
+      $scope.editBtn.show = false;
+      //$scope.inviteBtn.show = false;
+      $scope.payBtn.show = false;
+      $scope.cancelBtn.show = false;
+      //$scope.payMethodCheckBox.show = false;
+      //$scope.payMethodDiv.show = true;
+
+      if (isOwner == true) {
+
+        if (drivingRangeOrderState < 2) {
+          $scope.editBtn.show = true;
+          $scope.cancelBtn.show = true;
+          //$scope.payMethodDiv.show = false;
+          //$scope.payMethodCheckBox.show = true;
+        }
+
+        if (drivingRangeOrderState == 1) {
+          $scope.payBtn.show = true;
+        } else if (drivingRangeOrderState == 2) {
+          //$scope.inviteBtn.show = true;
+          $scope.cancelBtn.show = payType == 0;
+        }
+      }
+
+      var stateStr = drivingRangeOrderState > 0 ? "球场&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" : "等待球场&nbsp;&nbsp;";
+      document.getElementById('confirm_state_0').innerHTML = stateStr;
+
+      stateStr = drivingRangeOrderState > 0 ? "已确认&nbsp;&nbsp;&nbsp;&nbsp;" : "确认&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+      document.getElementById("confirm_state_1").innerHTML = stateStr;
+
+      stateStr = drivingRangeOrderState > 1 ? "支付&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" : "等待&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+      document.getElementById("pay_state_0").innerHTML = stateStr;
+
+      stateStr = drivingRangeOrderState > 1 ? "成功&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" : "支付&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+      document.getElementById("pay_state_1").innerHTML = stateStr;
+
+      $scope.state1 = drivingRangeOrderState > -1;
+      $scope.state2 = drivingRangeOrderState > 0;
+      $scope.state3 = drivingRangeOrderState > 1;
+      $scope.state4 = drivingRangeOrderState > 2;
+
+      var imgPath = "/img/";
+
+      if (drivingRangeOrderState == 0) {
+        imgPath += "img_prg_0.png";
+      } else if (drivingRangeOrderState == 1) {
+        imgPath += "img_prg_1.png";
+      } else if (drivingRangeOrderState == 2) {
+        imgPath += "img_prg_2.png";
+      } else if (drivingRangeOrderState == 3) {
+        imgPath += "img_prg_3.png";
+      }
+
+      $scope.progressImg = imgPath;
+    }
+  });
+</script>
+{% endblock %}

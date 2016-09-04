@@ -1,0 +1,270 @@
+<!-- Content Header (Page header) -->
+<div id="lessonPanel" ng-controller="lessonPanelController">
+  <section class="content-header">
+    <h1>
+      课程
+      <small>课程管理</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="/admin/"><i class="fa fa-dashboard"></i> 主页</a></li>
+      <li class="active">课程</li>
+    </ol>
+  </section>
+
+  <!-- Main content -->
+  <section class="content">
+
+    <div id="createLessonRow" class="row collapse">
+      <div class="col-xs-12">
+        <!-- Horizontal Form -->
+        <div class="box box-info">
+          <div class="box-header with-border">
+            <h3 class="box-title">添加课程</h3>
+          </div><!-- /.box-header -->
+          <div class="box-body">
+            <!-- form start -->
+            <form class="form-horizontal" name="createLessonForm" novalidate>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">课程图片</label>
+                <div class="col-sm-10">
+                  <input type="file" id="newLessonPhoto">
+                  <img id="newLessonPhotoPreview"/>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">课程名称</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="title" ng-model="newLesson.title" required>
+                  <code ng-show="createLessonForm.title.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">开始日期</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <div class="input-group-addon">
+                      <i class="fa fa-calendar"></i>
+                    </div>
+                    <input type="text" class="form-control pull-right" id="newLessonDateStart"
+                           name="dateStart"
+                           ng-model="newLesson.dateStart" required>
+                  </div>
+                  <code ng-show="createLessonForm.dateStart.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">结束日期</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <div class="input-group-addon">
+                      <i class="fa fa-calendar"></i>
+                    </div>
+                    <input type="text" class="form-control pull-right" id="newLessonDateEnd"
+                           name="dateEnd"
+                           ng-model="newLesson.dateEnd" required>
+                  </div>
+                  <code ng-show="createLessonForm.dateEnd.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">价格</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-addon">￥</span>
+                    <input type="number" class="form-control" name="fees" ng-model="newLesson.fees" required>
+                  </div>
+                  <code ng-show="createLessonForm.fees.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">描叙</label>
+                <div class="col-sm-10">
+                  <textarea ckeditor class="form-control" id="newLessonDescription" name="description"
+                            ng-model="newLesson.description" rows="10" required>
+                  </textarea>
+                  <code ng-show="createLessonForm.description.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">开启</label>
+                <div class="col-sm-10">
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox" name="inStock" ng-model="newLesson.inStock">上架
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div><!-- /.box-body -->
+          <div class="box-footer">
+            <button class="btn btn-default" data-toggle="collapse" data-target="#createLessonRow">
+              取消
+            </button>
+            <button class="btn btn-info pull-right" ng-click='createLesson();'>添加</button>
+          </div><!-- /.box-footer -->
+        </div><!-- /.box -->
+        <!-- general form elements disabled -->
+      </div><!--/.col (right) -->
+    </div>   <!-- /.row -->
+
+    <div id="modifyLessonRow" class="row collapse">
+      <div class="col-xs-12">
+        <!-- Horizontal Form -->
+        <div class="box box-warning">
+          <div class="box-header with-border">
+            <h3 class="box-title">修改课程</h3>
+          </div><!-- /.box-header -->
+          <div class="box-body">
+            <!-- form start -->
+            <form class="form-horizontal" name="modifyLessonForm" novalidate>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">课程ID</label>
+                <div class="col-sm-10">
+                  <label class="control-label" ng-bind="updatedLesson.id"></label>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">课程图片</label>
+                <div class="col-sm-10">
+                  <input type="file" id="updatedLessonPhoto">
+                  <img id="updatedLessonPhotoPreview"/>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">课程名称</label>
+                <div class="col-sm-10">
+                  <input type="text" class="form-control" name="title" ng-model="updatedLesson.title" required>
+                  <code ng-show="modifyLessonForm.title.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">开始日期</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <div class="input-group-addon">
+                      <i class="fa fa-calendar"></i>
+                    </div>
+                    <input type="text" class="form-control pull-right" id="updatedLessonDateStart"
+                           name="dateStart"
+                           ng-model="updatedLesson.dateStart" required>
+                  </div>
+                  <code ng-show="modifyLessonForm.dateStart.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">结束日期</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <div class="input-group-addon">
+                      <i class="fa fa-calendar"></i>
+                    </div>
+                    <input type="text" class="form-control pull-right" id="updatedLessonDateEnd"
+                           name="dateEnd"
+                           ng-model="updatedLesson.dateEnd" required>
+                  </div>
+                  <code ng-show="modifyLessonForm.dateEnd.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">价格</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <span class="input-group-addon">￥</span>
+                    <input type="number" class="form-control" name="fees" ng-model="updatedLesson.fees" required>
+                  </div>
+                  <code ng-show="modifyLessonForm.fees.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">描叙</label>
+                <div class="col-sm-10">
+                  <textarea ckeditor class="form-control" id="updatedLessonDescription" name="description"
+                            ng-model="updatedLesson.description" rows="10" required>
+                  </textarea>
+                  <code ng-show="modifyLessonForm.description.$error.required">必填</code>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">开启</label>
+                <div class="col-sm-10">
+                  <div class="checkbox">
+                    <label>
+                      <input type="checkbox" name="inStock" ng-model="updatedLesson.inStock">上架
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div><!-- /.box-body -->
+          <div class="box-footer">
+            <button class="btn btn-default" data-toggle="collapse" data-target="#modifyLessonRow">
+              取消
+            </button>
+            <button class="btn btn-warning pull-right" ng-click='modifyLesson();'>修改</button>
+          </div><!-- /.box-footer -->
+        </div><!-- /.box -->
+        <!-- general form elements disabled -->
+      </div><!--/.col (right) -->
+    </div>   <!-- /.row -->
+
+    <div id="lessonListRow" class="row">
+      <div class="col-xs-12">
+        <div class="box">
+          <div class="box-header">
+            <h3 class="box-title">课程列表</h3>
+            <div class="box-tools pull-right">
+              <button class="btn btn-primary btn-sm" ng-click='showCreateLessonRow();'>添加课程
+              </button>
+            </div>
+          </div><!-- /.box-header -->
+          <div class="box-body">
+            <table id="lessonListTable" class="table table-bordered table-striped">
+              <thead>
+              <tr>
+                <th>ID</th>
+                <th>课程名称</th>
+                <th>费用</th>
+                <th>描叙</th>
+                <th>操作</th>
+              </tr>
+              </thead>
+              <tfoot>
+              <tr>
+                <th>ID</th>
+                <th>课程名称</th>
+                <th>费用</th>
+                <th>描叙</th>
+                <th>操作</th>
+              </tr>
+              </tfoot>
+            </table>
+          </div><!-- /.box-body -->
+        </div><!-- /.box -->
+      </div><!-- /.col -->
+    </div><!-- /.row -->
+
+    <div id="removeLessonModal" class="modal modal-danger fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">删除课程</h4>
+          </div>
+          <div class="modal-body">
+            <p id="removeLessonModalContent"></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-outline" ng-click='removeLesson();'>确认</button>
+          </div>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+
+  </section>
+  <!-- /.content -->
+</div>
